@@ -71,3 +71,18 @@ export function calcularParcelaBalao(
     .reduce((s, p) => s + p.valor_previsto, 0)
   return Math.max(0, valorContrato - outras)
 }
+
+/**
+ * Parcelas que geram pagina de anexo no cronograma em PDF (spec 4.9: "com os
+ * comprovantes de pagamento anexados ao final do documento").
+ *
+ * Fica aqui, e nao na tela, para que a regra "so entra quem tem comprovante, na
+ * ordem das parcelas" seja verificavel por teste.
+ */
+export function parcelasParaAnexar<T extends { numero_parcela: number; comprovante_assinado: string | null }>(
+  parcelas: T[],
+): T[] {
+  return parcelas
+    .filter((p) => Boolean(p.comprovante_assinado))
+    .sort((a, b) => a.numero_parcela - b.numero_parcela)
+}

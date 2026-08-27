@@ -1,87 +1,48 @@
-# O que ainda falta construir
+# Pendências
 
-A ordem da especificação (item 13) manda entregar funcionando do item 1 ao 5 antes de seguir.
-Isso está entregue. Este arquivo registra o que resta, na ordem em que deve ser construído.
+Os catorze itens da ordem de construção da especificação estão entregues. O que resta não é
+código — são duas coisas que dependem de material seu, e uma que a própria especificação deixou
+de fora.
 
-## 6. Fechamento e relatório de débitos (spec 4.12 e 4.14)
+## Precisa de você
 
-O documento que fecha a conta com o cliente: serviços por frente de trabalho ou por local,
-deduções com justificativa, adiantamentos recebidos, notas a repassar, almoxarifado cobrado e o
-saldo devedor. Junto vem o seletor de versão de exibição do item 4.14 (mostrar ou esconder preço
-unitário, quantidade, BDI, prazo, CNPJ, número do orçamento; agrupar em valor único; versão para
-o pedreiro), com a combinação usada salva em cada documento gerado.
+**A logo da RV.** Os documentos e os ícones do app usam um monograma provisório. Suba o arquivo no
+bucket `publico` do Supabase e cole a URL no parâmetro `empresa_logo_url`, em Cadastros →
+Parâmetros. Ela passa a aparecer no topo de todo documento gerado. Os ícones do PWA
+(`public/icons/`) podem ser substituídos pelos arquivos definitivos no mesmo formato.
 
-As tabelas `servicos_executados` e `documentos` já existem, com `versao_exibicao_json`.
+**As tabelas de preço.** Três bases entram por CSV e ainda estão vazias:
 
-## 7. Almoxarifado (spec 4.10)
+- SINAPI, ORSE e SICRO do Piauí, em Cadastros → Preços referenciais;
+- as cotações dos fornecedores, em Cadastros → Base de preços — é ela que alimenta a cotação
+  solar, então o módulo solar só monta a proposta depois que ela tiver preço de módulo, inversor,
+  estrutura, cabo, string box e material elétrico;
+- os cerca de 85 itens da tabela de locação, em Locação → Equipamentos.
 
-Estoque por categoria em caixa alta com faixa destacada, custo unitário e valor de cobrança,
-cabo elétrico por pedaço com subtotal por cor e bitola, saídas com marcação de cobrar do cliente
-alimentando o fechamento, saída em planilha A4 e PDF.
+Os três importadores aceitam o CSV exportado direto do Excel, com ponto e vírgula e decimal com
+vírgula.
 
-Tabelas `almoxarifado_itens` e `almoxarifado_saidas` prontas; o painel da obra já soma o
-almoxarifado cobrado na receita.
+## Decisão sua, já implementada dos dois jeitos
 
-## 8. Medições e terceiros (spec 4.11)
-
-Cadastro do serviço por produção com unidade, quantidade contratada, custo e preço de venda;
-lançamento da medição por data e local; terceiros com valor combinado, pago, saldo e comprovante;
-item terceirizado "a cotar separadamente".
-
-Tabelas `servicos_medicao`, `medicoes`, `terceiros` e `servicos_terceiros` prontas; o painel da
-obra já soma as medições na receita e os terceiros no custo.
-
-## 9. Orçamentos (spec 4.13)
-
-Orçamento rápido e orçamento completo com fases hierárquicas, base de preços referenciais
-(SINAPI, ORSE, SICRO) importável por CSV, itens próprios convivendo com itens de referência, BDI
-configurável nos três modos de exibição, aba de pendências, memorial descritivo e pesquisa de
-preços, saída em xlsx e PDF.
-
-Tabelas `orcamentos` e `itens_orcamento` prontas, incluindo `modo_bdi` e `base_referencia`.
-
-## 11. Arquivos recebidos e galeria de fotos (spec 4.16)
-
-Repositório por cliente e por obra para projetos, contratos, cartão CNPJ e conta de energia, mais
-a galeria de fotos da obra com marcação antes/depois.
-
-Tabela `arquivos` pronta, com `galeria` e `momento`; bucket `arquivos` criado.
-
-## 12. Base de preços de material e cotações (spec 6)
-
-Registro da cotação recebida com itens, condição e validade; cotação marcada como base; itens
-substituídos e estimados sinalizados; comparativo lado a lado; apuração do custo por m² e sugestão
-de preço de venda pela margem.
-
-Tabelas `cotacoes` e `itens_cotacao` prontas.
-
-## 13. Energia solar — o que falta (spec 5.5 a 5.7)
-
-O dimensionamento e a projeção de economia estão prontos e testados. Falta a cotação a partir da
-base de preços dos fornecedores (menor preço vigente, sinalização de cotação vencida, troca manual
-de fornecedor) e a geração da proposta em xlsx e PDF.
-
-Tabelas `projetos_solar` e `itens_projeto_solar` prontas.
-
-## 14. Locação de equipamentos (spec 7)
-
-Deliberadamente o último. Cadastro de equipamentos, tabela de preços por diária, semana e mês
-importável por CSV, contrato de locação, devolução com diárias adicionais, alertas de vencimento e
-geração de contrato e recibo em PDF.
-
-Tabelas `equipamentos`, `tabela_locacao`, `contratos_locacao` e `itens_contrato_locacao` prontas.
-
----
+**A base do rateio com o parceiro** (item 14.2 da especificação). É configurável obra a obra, em
+Cadastros → Obras, e está explicada no README. A tela de Resultado mostra as duas apurações
+separadas, então dá para olhar os números de uma obra real antes de decidir.
 
 ## Fora desta versão
 
-Levantamento de quantitativo a partir de projeto (forro, concreto, aço) — item 14.10 da
-especificação.
+Levantamento de quantitativo a partir de projeto — forro, concreto, aço. É o item 14.10 da
+especificação, que já o coloca fora do escopo desta versão.
 
-## Coisas menores anotadas pelo caminho
+## Confirmações da seção 14 que seguiram o padrão indicado
 
-- **Logo da RV**: os documentos usam um monograma provisório. Suba o arquivo no bucket `publico`
-  e cole a URL no parâmetro `empresa_logo_url` para que ele apareça no topo de todo documento.
-- **Leitura automática da nota pela foto** (valor, data e CNPJ): a especificação trata como
-  desejável, não obrigatório. A entrada manual está feita.
-- **Ícones do PWA**: gerados como monograma provisório, mesma observação da logo.
+Todas implementadas como a especificação sugeriu, e todas ajustáveis sem mexer no código:
+
+1. meia diária a 50%, editável pelo administrador no próprio lançamento;
+2. rateio com o parceiro — ver acima;
+3. recibo de pagamento do funcionário: incluído;
+4. custo unitário no almoxarifado: incluído, e separado do valor de cobrança;
+5. galeria de fotos da obra: incluída, com marcação antes/depois;
+6. perfil de lançador: incluído, com o bloqueio garantido no banco;
+7. orçamento com SINAPI/ORSE/SICRO e BDI: incluído;
+8. base de preços de material: incluída;
+9. módulo de locação: incluído, construído por último, como pedido.

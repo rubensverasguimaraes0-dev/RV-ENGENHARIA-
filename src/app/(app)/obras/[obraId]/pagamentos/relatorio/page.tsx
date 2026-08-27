@@ -4,7 +4,12 @@ import { exigirAdmin } from '@/lib/supabase/sessao'
 import { carregarObra } from '@/lib/dados/obra'
 import { listarParcelas } from '@/lib/dados/pagamentos'
 import { carregarParametros, dadosEmpresa } from '@/lib/parametros'
-import { resumirCronograma, statusDaParcela, valorEfetivo } from '@/lib/domain/pagamentos'
+import {
+  parcelasParaAnexar,
+  resumirCronograma,
+  statusDaParcela,
+  valorEfetivo,
+} from '@/lib/domain/pagamentos'
 import { Documento, BlocoDados, BarraImpressao } from '@/components/documento'
 import { BotaoImprimir } from '@/components/botao-imprimir'
 import { formatarData, formatarMoeda, hojeISO } from '@/lib/format'
@@ -29,7 +34,7 @@ export default async function RelatorioCronograma({
   const resumo = resumirCronograma(parcelas, obra.valor_contrato, hoje)
   const empresa = dadosEmpresa(parametros)
   const cliente = obra.pagador ?? obra.cliente
-  const comComprovante = parcelas.filter((p) => p.comprovante_assinado)
+  const comComprovante = parcelasParaAnexar(parcelas)
 
   return (
     <>

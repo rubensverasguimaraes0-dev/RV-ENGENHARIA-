@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { calcularParcelaBalao, resumirCronograma, statusDaParcela, valorEfetivo } from './pagamentos'
+import {
+  calcularParcelaBalao,
+  parcelasParaAnexar,
+  resumirCronograma,
+  statusDaParcela,
+  valorEfetivo,
+} from './pagamentos'
 import type { Pagamento } from './tipos'
 
 function parcela(id: string, extra: Partial<Pagamento> = {}): Pagamento {
@@ -77,5 +83,30 @@ describe('parcela balao e alerta de vencimento', () => {
       '2026-08-20',
     )
     expect(r.parcelas_atrasadas).toBe(1)
+  })
+})
+
+describe('caso 19 — comprovantes anexados ao final do cronograma', () => {
+  const parcelas = [
+    { ...parcela('p3'), numero_parcela: 3, comprovante_assinado: 'https://exemplo/c3.jpg' },
+    { ...parcela('p1'), numero_parcela: 1, comprovante_assinado: 'https://exemplo/c1.jpg' },
+    { ...parcela('p2'), numero_parcela: 2, comprovante_assinado: null },
+  ]
+
+  it('anexa uma página por parcela que tem comprovante', () => {
+    const anexos = parcelasParaAnexar(parcelas)
+    expect(anexos).toHaveLength(2)
+  })
+
+  it('não anexa parcela sem comprovante', () => {
+    expect(parcelasParaAnexar(parcelas).map((p) => p.numero_parcela)).not.toContain(2)
+  })
+
+  it('mantém a ordem das parcelas nos anexos', () => {
+    expect(parcelasParaAnexar(parcelas).map((p) => p.numero_parcela)).toEqual([1, 3])
+  })
+
+  it('sem comprovante nenhum, não há anexo', () => {
+    expect(parcelasParaAnexar([{ ...parcela('p1'), comprovante_assinado: null }])).toEqual([])
   })
 })
