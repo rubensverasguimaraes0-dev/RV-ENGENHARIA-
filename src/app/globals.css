@@ -1,0 +1,188 @@
+@import 'tailwindcss';
+
+/*
+  Linguagem visual (spec 12): tabelas com secoes, colorido, direto e denso.
+  Nada de layout minimalista com muito branco. O valor total nao sai em fonte
+  muito grande. Tudo pensado para A4 e para leitura no celular.
+*/
+@theme {
+  --color-rv-900: #073457;
+  --color-rv-800: #0b4f8a;
+  --color-rv-700: #0f5f9e;
+  --color-rv-600: #1673b8;
+  --color-rv-100: #e3eefb;
+  --color-rv-50: #f2f7fd;
+
+  --color-ok-700: #14653b;
+  --color-ok-100: #dcf5e6;
+  --color-alerta-700: #8a5300;
+  --color-alerta-100: #fdf0d5;
+  --color-erro-700: #9b1c1c;
+  --color-erro-100: #fde4e4;
+
+  --font-sans: ui-sans-serif, system-ui, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: #eef2f7;
+  color: #10202e;
+  font-family: var(--font-sans);
+  font-size: 15px;
+}
+
+/* --- Tabela padrao do app e dos documentos --------------------------------- */
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.tabela th,
+.tabela td {
+  border: 1px solid #b9cadb;
+  padding: 4px 7px;
+  text-align: left;
+  vertical-align: top;
+}
+.tabela thead th {
+  background: var(--color-rv-800);
+  color: #fff;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+/* faixa de secao/categoria dentro da tabela */
+.tabela tr.secao td {
+  background: var(--color-rv-100);
+  color: var(--color-rv-900);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.tabela tr.subtotal td {
+  background: #f4f7fb;
+  font-weight: 600;
+}
+.tabela tr.total td {
+  background: var(--color-rv-900);
+  color: #fff;
+  font-weight: 700;
+}
+.tabela tbody tr:nth-child(even):not(.secao):not(.subtotal):not(.total) td {
+  background: #fafcfe;
+}
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* --- Etiquetas de status --------------------------------------------------- */
+.etiqueta {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.etiqueta-ok    { background: var(--color-ok-100);     color: var(--color-ok-700); }
+.etiqueta-alerta{ background: var(--color-alerta-100); color: var(--color-alerta-700); }
+.etiqueta-erro  { background: var(--color-erro-100);   color: var(--color-erro-700); }
+.etiqueta-neutra{ background: #e6ecf3;                 color: #37536b; }
+
+/* --- Formularios ----------------------------------------------------------- */
+.campo {
+  width: 100%;
+  border: 1px solid #a9bed2;
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: #fff;
+  font-size: 15px; /* 16px-ish evita zoom automatico no iOS */
+}
+.campo:focus {
+  outline: 2px solid var(--color-rv-600);
+  outline-offset: -1px;
+}
+.rotulo {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #3d566e;
+  margin-bottom: 3px;
+}
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 6px;
+  padding: 9px 14px;
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.botao-primario { background: var(--color-rv-800); color: #fff; }
+.botao-primario:hover { background: var(--color-rv-700); }
+.botao-neutro { background: #fff; color: var(--color-rv-900); border-color: #a9bed2; }
+.botao-neutro:hover { background: var(--color-rv-50); }
+.botao-perigo { background: var(--color-erro-700); color: #fff; }
+.botao:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.cartao {
+  background: #fff;
+  border: 1px solid #cdd9e5;
+  border-radius: 8px;
+}
+.cartao-titulo {
+  background: var(--color-rv-800);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding: 7px 12px;
+  border-radius: 7px 7px 0 0;
+}
+
+/* --- Documentos A4 --------------------------------------------------------- */
+.folha {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 12px auto;
+  padding: 12mm 12mm 16mm;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+@page {
+  size: A4;
+  margin: 10mm;
+}
+
+@media print {
+  body { background: #fff; }
+  .nao-imprimir { display: none !important; }
+  .folha {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+  .quebra-pagina { break-before: page; }
+  .evitar-quebra { break-inside: avoid; }
+  .tabela thead { display: table-header-group; }
+  .tabela tr { break-inside: avoid; }
+  /* garante que as faixas coloridas saiam na impressao */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
