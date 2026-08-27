@@ -1,8 +1,18 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { supabaseConfigurado } from '@/lib/supabase/config'
 
 /** Renova a sessao do Supabase a cada navegacao e protege as rotas do app. */
 export async function middleware(request: NextRequest) {
+  // App ainda sem Supabase: manda para a tela de configuracao em vez de quebrar.
+  if (!supabaseConfigurado()) {
+    if (request.nextUrl.pathname === '/configurar') return NextResponse.next({ request })
+    const url = request.nextUrl.clone()
+    url.pathname = '/configurar'
+    url.search = ''
+    return NextResponse.redirect(url)
+  }
+
   let response = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -29,7 +39,7 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
-  const rotaPublica = pathname === '/login' || pathname === '/offline'
+  const rotaPublica = pathname === '/login' || pathname === '/offline' || pathname === '/configurar'
 
   if (!user && !rotaPublica) {
     const url = request.nextUrl.clone()
