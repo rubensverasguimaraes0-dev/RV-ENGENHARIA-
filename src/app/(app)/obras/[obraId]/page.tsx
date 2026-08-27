@@ -164,19 +164,16 @@ export default async function PainelDaObra({ params }: { params: Promise<{ obraI
             </div>
           </Cartao>
 
-          <Cartao titulo="Atalhos">
-            <div className="grid grid-cols-2 gap-2">
-              <Link href={`/obras/${obraId}/dia`} className="botao botao-neutro">
-                Lançar o dia
+          <Cartao titulo="Documentos da obra">
+            <div className="grid grid-cols-1 gap-2">
+              <Link href={`/obras/${obraId}/fechamento`} className="botao botao-neutro">
+                Relatório de serviços prestados
               </Link>
-              <Link href={`/obras/${obraId}/notas/nova`} className="botao botao-neutro">
-                Fotografar nota
+              <Link href={`/obras/${obraId}/relatorio-despesas`} className="botao botao-neutro">
+                Relatório de despesas
               </Link>
-              <Link href={`/obras/${obraId}/pagamentos`} className="botao botao-neutro">
-                Cronograma
-              </Link>
-              <Link href={`/obras/${obraId}/resultado`} className="botao botao-neutro">
-                Resultado
+              <Link href={`/obras/${obraId}/pagamentos/relatorio`} className="botao botao-neutro">
+                Cronograma de pagamentos
               </Link>
             </div>
           </Cartao>

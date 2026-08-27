@@ -4,17 +4,22 @@ import type { FechamentoSemanal } from '@/lib/domain/fechamento-semanal'
 import { centavosParaPlanilha, formatarData, nomeDoDia } from '@/lib/format'
 import { ROTULO_TIPO_DIARIA } from '@/lib/domain/lancamento'
 import type { DadosEmpresa } from '@/lib/parametros'
+import {
+  MOEDA,
+  borda,
+  cabecalhoDoc,
+  estiloCabecalhoTabela,
+  estiloSubtotal,
+  estiloTotal,
+  faixaSecao,
+  nomeDeAba,
+} from './estilo-planilha'
 
 /**
  * Fechamento semanal em xlsx: uma aba por dia da semana + aba de resumo
  * (spec 4.5). Regra 11.2: todo total sai por formula, nunca digitado — por isso
  * as celulas de soma recebem { formula }, e nao o numero ja calculado.
  */
-
-const AZUL = 'FF0B4F8A'
-const AZUL_CLARO = 'FFE3EEFB'
-const AZUL_ESCURO = 'FF073457'
-const MOEDA = 'R$ #,##0.00'
 
 export async function gerarPlanilhaSemanal(opcoes: {
   fechamento: FechamentoSemanal
@@ -42,54 +47,13 @@ interface Contexto {
   semana?: number
 }
 
-function cabecalho(ws: ExcelJS.Worksheet, titulo: string, ctx: Contexto, colunas: number) {
-  const ultima = String.fromCharCode(64 + colunas)
-
-  ws.mergeCells(`A1:${ultima}1`)
-  const t = ws.getCell('A1')
-  t.value = `${ctx.empresa.nome} — ${titulo}`
-  t.font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } }
-  t.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL } }
-  t.alignment = { vertical: 'middle' }
-  ws.getRow(1).height = 22
-
-  ws.mergeCells(`A2:${ultima}2`)
-  const s = ws.getCell('A2')
-  s.value = `${ctx.clienteNome} — ${ctx.obraNome}`
-  s.font = { size: 10, color: { argb: AZUL_ESCURO } }
-  s.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_CLARO } }
-}
-
-function estiloCabecalhoTabela(row: ExcelJS.Row) {
-  row.eachCell((cell) => {
-    cell.font = { bold: true, size: 10, color: { argb: 'FFFFFFFF' } }
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL } }
-    cell.border = borda()
-    cell.alignment = { vertical: 'middle', wrapText: true }
-  })
-}
-
-function borda(): Partial<ExcelJS.Borders> {
-  const l = { style: 'thin' as const, color: { argb: 'FFB9CADB' } }
-  return { top: l, left: l, bottom: l, right: l }
-}
-
-function faixaSecao(ws: ExcelJS.Worksheet, linha: number, colunas: number, texto: string) {
-  ws.mergeCells(linha, 1, linha, colunas)
-  const c = ws.getCell(linha, 1)
-  c.value = texto
-  c.font = { bold: true, size: 10, color: { argb: AZUL_ESCURO } }
-  c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_CLARO } }
-  c.border = borda()
-}
-
 function abaDoDia(
   wb: ExcelJS.Workbook,
   dia: FechamentoSemanal['dias'][number],
   ctx: Contexto,
 ) {
   const nome = `${nomeDoDia(dia.data)} ${formatarData(dia.data).slice(0, 5).replace('/', '-')}`
-  const ws = wb.addWorksheet(nome.slice(0, 31), {
+  const ws = wb.addWorksheet(nomeDeAba(nome), {
     pageSetup: { paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1 },
   })
   ws.columns = [
@@ -100,7 +64,7 @@ function abaDoDia(
     { width: 14 },
   ]
 
-  cabecalho(ws, `Semana ${ctx.semana} — ${nomeDoDia(dia.data)}, ${formatarData(dia.data)}`, ctx, 5)
+  cabecalhoDoc(ws, `Semana ${ctx.semana} — ${nomeDoDia(dia.data)}, ${formatarData(dia.data)}`, ctx, 5)
 
   let linha = 4
   faixaSecao(ws, linha, 5, 'Presença do dia')
@@ -140,11 +104,7 @@ function abaDoDia(
   }
   totalPresenca.getCell(4).numFmt = MOEDA
   totalPresenca.getCell(5).numFmt = MOEDA
-  totalPresenca.eachCell((c) => {
-    c.font = { bold: true }
-    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF4F7FB' } }
-    c.border = borda()
-  })
+  estiloSubtotal(totalPresenca)
   const linhaTotalMaoObra = linha
   linha += 2
 
@@ -178,11 +138,7 @@ function abaDoDia(
     totalQ.getCell(3).value = 0
   }
   totalQ.getCell(3).numFmt = MOEDA
-  totalQ.eachCell((c) => {
-    c.font = { bold: true }
-    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF4F7FB' } }
-    c.border = borda()
-  })
+  estiloSubtotal(totalQ)
   const linhaTotalQuentinhas = linha
   linha += 2
 
@@ -193,11 +149,7 @@ function abaDoDia(
     formula: `D${linhaTotalMaoObra}+C${linhaTotalQuentinhas}`,
   }
   resumo.getCell(4).numFmt = MOEDA
-  resumo.eachCell((c) => {
-    c.font = { bold: true, color: { argb: 'FFFFFFFF' } }
-    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_ESCURO } }
-    c.border = borda()
-  })
+  estiloTotal(resumo)
 }
 
 function abaResumo(wb: ExcelJS.Workbook, f: FechamentoSemanal, ctx: Contexto) {
@@ -206,7 +158,7 @@ function abaResumo(wb: ExcelJS.Workbook, f: FechamentoSemanal, ctx: Contexto) {
   })
   ws.columns = [{ width: 28 }, { width: 16 }, { width: 10 }, { width: 14 }, { width: 14 }, { width: 14 }]
 
-  cabecalho(
+  cabecalhoDoc(
     ws,
     `Semana ${f.semana.numero} — ${formatarData(f.semana.data_inicio)} a ${formatarData(f.semana.data_fim)}`,
     ctx,
@@ -247,11 +199,7 @@ function abaResumo(wb: ExcelJS.Workbook, f: FechamentoSemanal, ctx: Contexto) {
   totalMo.getCell(5).value = houve ? { formula: `SUM(E${primeira}:E${ultima})` } : 0
   totalMo.getCell(6).value = houve ? { formula: `SUM(F${primeira}:F${ultima})` } : 0
   for (const c of [4, 5, 6]) totalMo.getCell(c).numFmt = MOEDA
-  totalMo.eachCell((c) => {
-    c.font = { bold: true }
-    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF4F7FB' } }
-    c.border = borda()
-  })
+  estiloSubtotal(totalMo)
   const linhaTotalMo = linha
   linha += 2
 
@@ -281,11 +229,7 @@ function abaResumo(wb: ExcelJS.Workbook, f: FechamentoSemanal, ctx: Contexto) {
   totalQ.getCell(2).value = houveQ ? { formula: `SUM(B${primeiraQ}:B${ultimaQ})` } : 0
   totalQ.getCell(3).value = houveQ ? { formula: `SUM(C${primeiraQ}:C${ultimaQ})` } : 0
   totalQ.getCell(3).numFmt = MOEDA
-  totalQ.eachCell((c) => {
-    c.font = { bold: true }
-    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF4F7FB' } }
-    c.border = borda()
-  })
+  estiloSubtotal(totalQ)
   const linhaTotalQ = linha
   linha += 2
 
@@ -313,11 +257,7 @@ function abaResumo(wb: ExcelJS.Workbook, f: FechamentoSemanal, ctx: Contexto) {
   custo.getCell(1).value = 'CUSTO DA SEMANA (mão de obra + quentinhas)'
   custo.getCell(2).value = { formula: `B${inicioFechamento}+B${inicioFechamento + 1}` }
   custo.getCell(2).numFmt = MOEDA
-  for (let c = 1; c <= 2; c++) {
-    custo.getCell(c).font = { bold: true, color: { argb: 'FFFFFFFF' } }
-    custo.getCell(c).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_ESCURO } }
-    custo.getCell(c).border = borda()
-  }
+  estiloTotal(custo)
 
   if (f.semana.dias_sem_expediente.length > 0) {
     linha += 2
