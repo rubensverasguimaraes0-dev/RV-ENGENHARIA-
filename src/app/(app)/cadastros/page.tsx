@@ -9,6 +9,7 @@ const AREAS = [
   { href: '/cadastros/fornecedores', titulo: 'Fornecedores', desc: 'Lojas e fornecedores usados no lançamento de notas.' },
   { href: '/cadastros/terceiros', titulo: 'Terceiros', desc: 'Subempreiteiros: gesseiro, marmoraria, serralheria.' },
   { href: '/cadastros/usuarios', titulo: 'Usuários', desc: 'Quem entra no app e a quais obras o lançador tem acesso.' },
+  { href: '/cadastros/precos-referencia', titulo: 'Preços referenciais', desc: 'SINAPI, ORSE e SICRO importados por CSV, base do orçamento executivo.' },
   { href: '/cadastros/parametros', titulo: 'Parâmetros', desc: 'Quentinha, meia diária, margem, BDI, HSP e textos padrão.' },
 ]
 
