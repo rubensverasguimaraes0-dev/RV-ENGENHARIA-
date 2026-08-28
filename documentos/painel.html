@@ -223,7 +223,7 @@ a.cartao .oque{font-size:.87rem;color:var(--meio);margin-top:.25rem}
   </p>
 
   <div class="placar">
-    <div class="ficha"><div class="num">248</div><div class="rot">testes passando, em 16 arquivos</div></div>
+    <div class="ficha"><div class="num">246</div><div class="rot">testes passando, em 16 arquivos</div></div>
     <div class="ficha"><div class="num">50</div><div class="rot">rotas compilando no build</div></div>
     <div class="ficha"><div class="num">30</div><div class="rot">casos de teste da especificação, todos cobertos</div></div>
     <div class="ficha"><div class="num">0</div><div class="rot">erros de lint, de tipo e de segurança</div></div>
@@ -337,18 +337,6 @@ a.cartao .oque{font-size:.87rem;color:var(--meio);margin-top:.25rem}
       <li>
         <span class="selo-cat">você</span>
         <div>
-          <div class="oque">A logo da RV — falta só o arquivo</div>
-          <div class="por">O app inteiro já está ligado nela. Suba a imagem no bucket
-          <code>publico</code> e cole a URL no parâmetro <code>empresa_logo_url</code>, em
-          Cadastros → Parâmetros: a partir daí ela aparece sozinha no topo do app, na tela de
-          login, nos nove documentos A4 e dentro das quatro planilhas. Só os ícones da tela de
-          início do celular ainda precisam do arquivo em mãos — me mande que eu gero os três
-          tamanhos.</div>
-        </div>
-      </li>
-      <li>
-        <span class="selo-cat">você</span>
-        <div>
           <div class="oque">As três tabelas de preço</div>
           <div class="por">SINAPI/ORSE/SICRO do Piauí, as cotações de fornecedor e os ~85 itens de
           locação. Entram por CSV exportado direto do Excel. A cotação solar só fecha preço depois
@@ -383,6 +371,19 @@ a.cartao .oque{font-size:.87rem;color:var(--meio);margin-top:.25rem}
       <span class="lado">tudo enviado ao GitHub</span>
     </div>
     <ul class="diario">
+      <li>
+        <div class="q">A sua logo entrou no app</div>
+        <div class="d">Ela agora acompanha o aplicativo em duas versões: a completa na tela de
+        login, nos documentos e nas planilhas, e só o monograma na barra do topo — com 36 pixels
+        de altura a palavra “engenharia” viraria um borrão. Gerei também os três ícones da tela de
+        início do celular. Nada disso precisa de configuração: já vem ligado.</div>
+      </li>
+      <li>
+        <div class="q">O teste no navegador pegou um bug antes de você</div>
+        <div class="d">O arquivo da logo estava sendo redirecionado para a tela de login pelo
+        próprio app — e a imagem quebrava justamente ali, que é onde ela mais aparece. Só apareceu
+        porque abri a tela de verdade em vez de confiar no código.</div>
+      </li>
       <li>
         <div class="q">Liguei a sua logo no aplicativo inteiro</div>
         <div class="d">Ela já saía nos nove documentos A4, mas não nas planilhas nem na própria
