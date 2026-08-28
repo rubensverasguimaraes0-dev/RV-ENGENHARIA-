@@ -15,6 +15,7 @@ import {
   estiloTotal,
   faixaSecao,
 } from './estilo-planilha'
+import { buscarLogo, type LogoPlanilha } from './logo-planilha'
 
 /**
  * Proposta solar em xlsx (spec 5.7).
@@ -34,34 +35,36 @@ export async function gerarPlanilhaSolar(opcoes: {
   empresa: DadosEmpresa
   incluirApuracao: boolean
 }): Promise<Buffer> {
+  const logo = await buscarLogo(opcoes.empresa.logo_url)
   const wb = new ExcelJS.Workbook()
   wb.creator = opcoes.empresa.nome
   wb.created = new Date()
 
-  abaProposta(wb, opcoes)
-  abaProjecao(wb, opcoes)
-  if (opcoes.incluirApuracao) abaApuracao(wb, opcoes)
+  abaProposta(wb, opcoes, logo)
+  abaProjecao(wb, opcoes, logo)
+  if (opcoes.incluirApuracao) abaApuracao(wb, opcoes, logo)
 
   return Buffer.from(await wb.xlsx.writeBuffer())
 }
 
 type Opcoes = Parameters<typeof gerarPlanilhaSolar>[0]
 
-function contexto(o: Opcoes) {
+function contexto(o: Opcoes, logo: LogoPlanilha | null) {
   return {
+    logo,
     empresa: o.empresa,
     obraNome: `UC ${o.projeto.uc ?? '—'} · ${o.projeto.concessionaria ?? ''}`,
     clienteNome: o.projeto.cliente_nome,
   }
 }
 
-function abaProposta(wb: ExcelJS.Workbook, o: Opcoes) {
+function abaProposta(wb: ExcelJS.Workbook, o: Opcoes, logo: LogoPlanilha | null) {
   const ws = wb.addWorksheet('Proposta', {
     pageSetup: { paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1 },
   })
   ws.columns = [{ width: 48 }, { width: 20 }, { width: 18 }]
 
-  cabecalhoDoc(ws, 'Proposta de energia solar', contexto(o), 3)
+  cabecalhoDoc(ws, 'Proposta de energia solar', contexto(o, logo), 3)
 
   let linha = 4
   faixaSecao(ws, linha, 3, 'Diagnóstico do consumo')
@@ -156,13 +159,13 @@ function abaProposta(wb: ExcelJS.Workbook, o: Opcoes) {
   ws.getCell(linha, 1).font = { size: 9, italic: true }
 }
 
-function abaProjecao(wb: ExcelJS.Workbook, o: Opcoes) {
+function abaProjecao(wb: ExcelJS.Workbook, o: Opcoes, logo: LogoPlanilha | null) {
   const ws = wb.addWorksheet('Projeção 25 anos', {
     pageSetup: { paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1 },
   })
   ws.columns = [{ width: 10 }, { width: 18 }, { width: 18 }, { width: 20 }]
 
-  cabecalhoDoc(ws, 'Projeção de economia em 25 anos', contexto(o), 4)
+  cabecalhoDoc(ws, 'Projeção de economia em 25 anos', contexto(o, logo), 4)
 
   let linha = 4
   const cab = ws.getRow(linha)
@@ -191,13 +194,13 @@ function abaProjecao(wb: ExcelJS.Workbook, o: Opcoes) {
   estiloTotal(total)
 }
 
-function abaApuracao(wb: ExcelJS.Workbook, o: Opcoes) {
+function abaApuracao(wb: ExcelJS.Workbook, o: Opcoes, logo: LogoPlanilha | null) {
   const ws = wb.addWorksheet('Apuração (interna)', {
     pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1 },
   })
   ws.columns = [{ width: 42 }, { width: 8 }, { width: 10 }, { width: 14 }, { width: 14 }, { width: 22 }]
 
-  cabecalhoDoc(ws, 'Apuração de custo — uso interno, não enviar ao cliente', contexto(o), 6)
+  cabecalhoDoc(ws, 'Apuração de custo — uso interno, não enviar ao cliente', contexto(o, logo), 6)
 
   let linha = 4
   const cab = ws.getRow(linha)

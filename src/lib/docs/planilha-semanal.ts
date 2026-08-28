@@ -14,6 +14,7 @@ import {
   faixaSecao,
   nomeDeAba,
 } from './estilo-planilha'
+import { buscarLogo, type LogoPlanilha } from './logo-planilha'
 
 /**
  * Fechamento semanal em xlsx: uma aba por dia da semana + aba de resumo
@@ -28,13 +29,14 @@ export async function gerarPlanilhaSemanal(opcoes: {
   clienteNome: string
 }): Promise<Buffer> {
   const { fechamento: f, empresa, obraNome, clienteNome } = opcoes
+  const logo = await buscarLogo(empresa.logo_url)
 
   const wb = new ExcelJS.Workbook()
   wb.creator = empresa.nome
   wb.created = new Date()
 
-  for (const dia of f.dias) abaDoDia(wb, dia, { obraNome, clienteNome, empresa, semana: f.semana.numero })
-  abaResumo(wb, f, { obraNome, clienteNome, empresa })
+  for (const dia of f.dias) abaDoDia(wb, dia, { obraNome, clienteNome, empresa, logo, semana: f.semana.numero })
+  abaResumo(wb, f, { obraNome, clienteNome, empresa, logo })
 
   const buffer = await wb.xlsx.writeBuffer()
   return Buffer.from(buffer)
@@ -44,6 +46,7 @@ interface Contexto {
   obraNome: string
   clienteNome: string
   empresa: DadosEmpresa
+  logo?: LogoPlanilha | null
   semana?: number
 }
 

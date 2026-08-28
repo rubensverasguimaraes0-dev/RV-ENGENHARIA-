@@ -4,6 +4,7 @@ import type { ResumoAlmoxarifado } from '@/lib/domain/almoxarifado'
 import { centavosParaPlanilha } from '@/lib/format'
 import type { DadosEmpresa } from '@/lib/parametros'
 import { AZUL, AZUL_CLARO, AZUL_ESCURO, MOEDA, borda, cabecalhoDoc, estiloCabecalhoTabela, faixaSecao } from './estilo-planilha'
+import { buscarLogo } from './logo-planilha'
 
 /**
  * Almoxarifado em xlsx (spec 4.10): planilha enxuta, pronta para A4, agrupada
@@ -17,6 +18,7 @@ export async function gerarPlanilhaAlmoxarifado(opcoes: {
   clienteNome: string
 }): Promise<Buffer> {
   const { resumo, empresa, obraNome, clienteNome } = opcoes
+  const logo = await buscarLogo(empresa.logo_url)
 
   const wb = new ExcelJS.Workbook()
   wb.creator = empresa.nome
@@ -27,7 +29,7 @@ export async function gerarPlanilhaAlmoxarifado(opcoes: {
   })
   ws.columns = [{ width: 38 }, { width: 10 }, { width: 13 }, { width: 12 }, { width: 12 }, { width: 15 }]
 
-  cabecalhoDoc(ws, 'Material em obra — almoxarifado', { empresa, obraNome, clienteNome }, 6)
+  cabecalhoDoc(ws, 'Material em obra — almoxarifado', { empresa, obraNome, clienteNome, logo }, 6)
 
   let linha = 4
   const linhasDeTotalPorCategoria: number[] = []

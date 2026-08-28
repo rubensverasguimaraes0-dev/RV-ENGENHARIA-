@@ -1,6 +1,7 @@
 import 'server-only'
 import ExcelJS from 'exceljs'
 import type { DadosEmpresa } from '@/lib/parametros'
+import { medidasNaFaixa, recuoDoTitulo, type LogoPlanilha } from './logo-planilha'
 
 /**
  * Estilo comum das planilhas geradas pelo app: tabelas com secoes, coloridas,
@@ -23,6 +24,28 @@ export interface ContextoDoc {
   empresa: DadosEmpresa
   obraNome: string
   clienteNome: string
+  /** Logo ja baixada pelo gerador. Ausente quando nao ha logo configurada. */
+  logo?: LogoPlanilha | null
+}
+
+/**
+ * Desenha a logo sobre a faixa do cabecalho e devolve o recuo que o titulo
+ * precisa. A imagem entra no workbook uma unica vez, mesmo com varias abas.
+ */
+function desenharLogo(ws: ExcelJS.Worksheet, logo: LogoPlanilha): number {
+  if (logo.idNoWorkbook === undefined) {
+    logo.idNoWorkbook = ws.workbook.addImage({
+      buffer: logo.dados as unknown as ExcelJS.Buffer,
+      extension: logo.formato,
+    })
+  }
+  const { largura, altura } = medidasNaFaixa(logo)
+  ws.addImage(logo.idNoWorkbook, {
+    tl: { col: 0.15, row: 0.1 },
+    ext: { width: largura, height: altura },
+    editAs: 'oneCell',
+  })
+  return recuoDoTitulo(logo)
 }
 
 /** Duas primeiras linhas de toda planilha: empresa + titulo, cliente + obra. */
@@ -39,7 +62,10 @@ export function cabecalhoDoc(
   t.value = `${ctx.empresa.nome} — ${titulo}`
   t.font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } }
   t.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL } }
-  t.alignment = { vertical: 'middle' }
+  // A logo flutua sobre as duas primeiras linhas; o titulo recua para nao
+  // ficar por baixo dela. Sem logo, nada muda em relacao ao que ja saia.
+  const recuo = ctx.logo ? desenharLogo(ws, ctx.logo) : 0
+  t.alignment = { vertical: 'middle', indent: recuo }
   ws.getRow(1).height = 22
 
   ws.mergeCells(`A2:${ultima}2`)
@@ -47,6 +73,7 @@ export function cabecalhoDoc(
   s.value = `${ctx.clienteNome} — ${ctx.obraNome}`
   s.font = { size: 10, color: { argb: AZUL_ESCURO } }
   s.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_CLARO } }
+  s.alignment = { indent: recuo }
 }
 
 export function estiloCabecalhoTabela(row: ExcelJS.Row) {

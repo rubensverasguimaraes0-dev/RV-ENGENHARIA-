@@ -1,9 +1,10 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import ExcelJS from 'exceljs'
 import { gerarPlanilhaSemanal } from './planilha-semanal'
 import { calcularFechamentoSemanal } from '@/lib/domain/fechamento-semanal'
 import type { Funcionario, LancamentoDiario, Quentinha, Semana } from '@/lib/domain/tipos'
 import type { DadosEmpresa } from '@/lib/parametros'
+import { pngFalso } from './logo-planilha.test'
 
 const EMPRESA: DadosEmpresa = {
   nome: 'RV Engenharia',
@@ -188,5 +189,70 @@ describe('planilha do fechamento semanal', () => {
     expect(formulas.some((f) => /^A\d+\*B\d+$/.test(f))).toBe(true)
     // total do dia = total de mao de obra + total de quentinhas
     expect(formulas.some((f) => /^D\d+\+C\d+$/.test(f))).toBe(true)
+  })
+})
+
+describe('a logo da empresa no topo da planilha (regra 11.3)', () => {
+  afterEach(() => { vi.unstubAllGlobals() })
+
+  const URL_LOGO = 'https://projeto.supabase.co/storage/v1/object/publico/rv.png'
+
+  function servirLogo(bytes: Uint8Array) {
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: true,
+      headers: { get: () => String(bytes.length) },
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
+    })))
+  }
+
+  async function gerar(logo_url: string) {
+    const buffer = await gerarPlanilhaSemanal({
+      fechamento: calcularFechamentoSemanal({ semana, funcionarios, lancamentos, quentinhas }),
+      empresa: { ...EMPRESA, logo_url },
+      obraNome: 'Obra do piso',
+      clienteNome: 'Cliente',
+    })
+    const wb = new ExcelJS.Workbook()
+    await wb.xlsx.load(buffer as unknown as ArrayBuffer)
+    return wb
+  }
+
+  it('embute a imagem uma única vez, mesmo com várias abas', async () => {
+    servirLogo(pngFalso(240, 80))
+    const wb = await gerar(URL_LOGO)
+
+    // uma imagem guardada no arquivo...
+    expect(wb.model.media).toHaveLength(1)
+    // ...e desenhada em todas as abas, inclusive no resumo
+    expect(wb.worksheets.length).toBeGreaterThan(1)
+    for (const ws of wb.worksheets) {
+      expect(ws.getImages()).toHaveLength(1)
+    }
+  })
+
+  it('recua o título para ele não ficar por baixo da logo', async () => {
+    servirLogo(pngFalso(240, 80))
+    const comLogo = await gerar(URL_LOGO)
+    const semLogo = await gerar('')
+
+    const recuo = (wb: ExcelJS.Workbook) =>
+      wb.worksheets[0]!.getCell('A1').alignment?.indent ?? 0
+
+    expect(recuo(comLogo)).toBeGreaterThan(0)
+    expect(recuo(semLogo)).toBe(0)
+  })
+
+  it('sem logo configurada a planilha sai como sempre saiu', async () => {
+    const wb = await gerar('')
+    expect(wb.model.media ?? []).toHaveLength(0)
+    expect(wb.worksheets[0]!.getCell('A1').value).toContain('RV Engenharia')
+  })
+
+  it('se a logo não carregar, a planilha sai mesmo assim', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('bucket fora do ar') }))
+    const wb = await gerar(URL_LOGO)
+    expect(wb.model.media ?? []).toHaveLength(0)
+    expect(wb.worksheets[0]!.getCell('A1').value).toContain('RV Engenharia')
   })
 })

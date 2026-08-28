@@ -14,6 +14,7 @@ import {
   estiloTotal,
   faixaSecao,
 } from './estilo-planilha'
+import { buscarLogo, type LogoPlanilha } from './logo-planilha'
 
 /**
  * Orcamento em xlsx (spec 4.13): planilha, aba de pendencias e memorial.
@@ -35,15 +36,16 @@ export async function gerarPlanilhaOrcamento(opcoes: {
   clienteNome: string
 }): Promise<Buffer> {
   const { orcamento, calculo, pendencias, empresa, obraNome, clienteNome } = opcoes
+  const logo = await buscarLogo(empresa.logo_url)
 
   const wb = new ExcelJS.Workbook()
   wb.creator = empresa.nome
   wb.created = new Date()
 
-  abaOrcamento(wb, opcoes)
-  if (pendencias.length > 0) abaPendencias(wb, pendencias, { empresa, obraNome, clienteNome })
-  if (orcamento.memorial) abaMemorial(wb, orcamento, { empresa, obraNome, clienteNome })
-  abaPesquisaPrecos(wb, calculo, { empresa, obraNome, clienteNome })
+  abaOrcamento(wb, opcoes, logo)
+  if (pendencias.length > 0) abaPendencias(wb, pendencias, { empresa, obraNome, clienteNome, logo })
+  if (orcamento.memorial) abaMemorial(wb, orcamento, { empresa, obraNome, clienteNome, logo })
+  abaPesquisaPrecos(wb, calculo, { empresa, obraNome, clienteNome, logo })
 
   return Buffer.from(await wb.xlsx.writeBuffer())
 }
@@ -52,6 +54,7 @@ interface Ctx {
   empresa: DadosEmpresa
   obraNome: string
   clienteNome: string
+  logo?: LogoPlanilha | null
 }
 
 function abaOrcamento(
@@ -69,6 +72,7 @@ function abaOrcamento(
     obraNome: string
     clienteNome: string
   },
+  logo: LogoPlanilha | null,
 ) {
   const ws = wb.addWorksheet('Orçamento', {
     pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1 },
@@ -85,7 +89,7 @@ function abaOrcamento(
     { width: 14 }, // total
   ]
 
-  cabecalhoDoc(ws, `Orçamento — ${orcamento.titulo ?? ''}`, { empresa, obraNome, clienteNome }, 9)
+  cabecalhoDoc(ws, `Orçamento — ${orcamento.titulo ?? ''}`, { empresa, obraNome, clienteNome, logo }, 9)
 
   let linha = 4
   faixaSecao(ws, linha, 9, 'Planilha orçamentária')
