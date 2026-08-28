@@ -33,10 +33,19 @@ comercial. Para uso da empresa o plano correto é o Pro.
 
 ## 2. Material seu
 
-**A logo da RV.** Os documentos e os ícones usam um monograma provisório. Suba o arquivo no bucket
-`publico` do Supabase e cole a URL no parâmetro `empresa_logo_url`, em Cadastros → Parâmetros. Ela
-passa a aparecer no topo de todo documento gerado. Os ícones do PWA (`public/icons/`) podem ser
-trocados pelos definitivos, no mesmo formato.
+**A logo da RV.** O app inteiro já está ligado nela — falta só o arquivo. Suba a imagem no bucket
+`publico` do Supabase e cole a URL no parâmetro `empresa_logo_url`, em Cadastros → Parâmetros.
+A partir daí ela aparece sozinha, sem mexer em código nenhum, em:
+
+- o topo do aplicativo e a tela de login, para todos os perfis;
+- os nove documentos A4 que vão ao cliente;
+- as quatro planilhas xlsx, embutida no arquivo.
+
+Enquanto o parâmetro estiver vazio, tudo isso cai no monograma "RV" — e se a URL estiver errada ou
+o bucket fora do ar, os documentos saem do mesmo jeito, sem a imagem.
+
+Uma coisa continua precisando do arquivo em mãos: os **ícones do PWA** (`public/icons/`), que são o
+que aparece na tela de início do celular. Me mande a logo que eu gero os três tamanhos.
 
 **As tabelas de preço.** Três bases entram por CSV e ainda estão vazias:
 
