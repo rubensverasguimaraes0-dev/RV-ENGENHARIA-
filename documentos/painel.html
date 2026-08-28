@@ -223,7 +223,7 @@ a.cartao .oque{font-size:.87rem;color:var(--meio);margin-top:.25rem}
   </p>
 
   <div class="placar">
-    <div class="ficha"><div class="num">218</div><div class="rot">testes passando, em 15 arquivos</div></div>
+    <div class="ficha"><div class="num">248</div><div class="rot">testes passando, em 16 arquivos</div></div>
     <div class="ficha"><div class="num">50</div><div class="rot">rotas compilando no build</div></div>
     <div class="ficha"><div class="num">30</div><div class="rot">casos de teste da especificação, todos cobertos</div></div>
     <div class="ficha"><div class="num">0</div><div class="rot">erros de lint, de tipo e de segurança</div></div>
@@ -337,9 +337,13 @@ a.cartao .oque{font-size:.87rem;color:var(--meio);margin-top:.25rem}
       <li>
         <span class="selo-cat">você</span>
         <div>
-          <div class="oque">A logo da RV</div>
-          <div class="por">Hoje os documentos usam um monograma provisório. Suba o arquivo no bucket
-          <code>publico</code> e cole a URL no parâmetro <code>empresa_logo_url</code>, em Cadastros → Parâmetros.</div>
+          <div class="oque">A logo da RV — falta só o arquivo</div>
+          <div class="por">O app inteiro já está ligado nela. Suba a imagem no bucket
+          <code>publico</code> e cole a URL no parâmetro <code>empresa_logo_url</code>, em
+          Cadastros → Parâmetros: a partir daí ela aparece sozinha no topo do app, na tela de
+          login, nos nove documentos A4 e dentro das quatro planilhas. Só os ícones da tela de
+          início do celular ainda precisam do arquivo em mãos — me mande que eu gero os três
+          tamanhos.</div>
         </div>
       </li>
       <li>
@@ -379,6 +383,20 @@ a.cartao .oque{font-size:.87rem;color:var(--meio);margin-top:.25rem}
       <span class="lado">tudo enviado ao GitHub</span>
     </div>
     <ul class="diario">
+      <li>
+        <div class="q">Liguei a sua logo no aplicativo inteiro</div>
+        <div class="d">Ela já saía nos nove documentos A4, mas não nas planilhas nem na própria
+        interface. Agora sai nos três. O que travava era permissão: a tabela de parâmetros é só de
+        administrador, porque guarda margem e BDI — criei uma view que expõe apenas as nove chaves
+        de identidade, que já saem impressas em todo documento. Provei num Postgres de verdade que
+        o lançador enxerga a logo e continua sem enxergar uma linha de custo.</div>
+      </li>
+      <li>
+        <div class="q">Achei e consertei um teste que nunca rodava</div>
+        <div class="d">O teste de permissões do banco — o que prova o caso 25 da sua especificação
+        — quebrava contra um banco instalado pelo <code>instalar.sql</code>. Passou a rodar dos
+        dois jeitos.</div>
+      </li>
       <li>
         <div class="q">Consertei o script de lint, que estava quebrado</div>
         <div class="d">O <code>npm run lint</code> abria um assistente interativo e travava. Agora
