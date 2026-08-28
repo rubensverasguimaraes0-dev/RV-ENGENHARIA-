@@ -7,6 +7,7 @@ import { itensParaProposta } from '@/lib/domain/proposta-solar'
 import { carregarParametros, dadosEmpresa, texto } from '@/lib/parametros'
 import { Documento, BlocoDados, BarraImpressao } from '@/components/documento'
 import { BotaoImprimir } from '@/components/botao-imprimir'
+import { EnviarWhatsApp } from '@/components/enviar-whatsapp'
 import { formatarData, formatarMoeda, formatarNumero, formatarPercentual, hojeISO } from '@/lib/format'
 
 const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
@@ -20,10 +21,13 @@ const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'O
  */
 export default async function PropostaSolar({
   params,
+  searchParams,
 }: {
   params: Promise<{ projetoId: string }>
+  searchParams: Promise<{ nova?: string }>
 }) {
   const { projetoId } = await params
+  const { nova } = await searchParams
   await exigirAdmin()
 
   const [dados, parametros] = await Promise.all([
@@ -85,11 +89,30 @@ export default async function PropostaSolar({
         <Link href={`/solar/${projetoId}`} className="botao botao-neutro">
           Voltar
         </Link>
-        <BotaoImprimir />
+        <BotaoImprimir rotulo="Salvar em PDF" />
+        <EnviarWhatsApp
+          telefone={projeto.cliente_telefone}
+          nomeCliente={projeto.cliente_nome}
+          potencia={`${formatarNumero(d.potencia_instalada_kwp, 2)} kWp`}
+          economiaMes={formatarMoeda(economia.economia_liquida_mes)}
+          investimento={formatarMoeda(investimento)}
+          empresa={empresa.nome}
+        />
         <Link href={`/api/solar/${projetoId}/planilha`} className="botao botao-neutro">
           Planilha (xlsx)
         </Link>
       </BarraImpressao>
+
+      {nova === '1' && (
+        <div className="nao-imprimir mx-auto my-3 max-w-[210mm] rounded border border-ok-700/40 bg-ok-100 px-3 py-2">
+          <p className="text-sm font-bold text-ok-700">Proposta pronta.</p>
+          <p className="text-xs text-ok-700 mt-0.5">
+            Para mandar ao cliente: <strong>Salvar em PDF</strong> e depois{' '}
+            <strong>Enviar pelo WhatsApp</strong>, anexando o arquivo salvo. Os valores ficaram
+            congelados neste projeto.
+          </p>
+        </div>
+      )}
 
       <Documento
         empresa={empresa}

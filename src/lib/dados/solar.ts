@@ -17,6 +17,8 @@ export interface ProjetoSolar {
   cliente_id: string
   cliente_nome: string
   cliente_documento: string | null
+  /** usado para enviar a proposta pelo WhatsApp */
+  cliente_telefone: string | null
   uc: string | null
   concessionaria: string | null
   tipo_ligacao: TipoLigacao
@@ -37,7 +39,7 @@ export interface ProjetoSolar {
 }
 
 const CAMPOS =
-  'id, cliente_id, uc, concessionaria, tipo_ligacao, tarifa, consumo_mensal_json, tipo_telhado, distancia_quadro, anexo_conta_url, potencia_kwp, qtd_modulos, modelo_modulo, modelo_inversor, custo_total, margem, preco_venda, status, criado_em, cliente:clientes (nome, documento)'
+  'id, cliente_id, uc, concessionaria, tipo_ligacao, tarifa, consumo_mensal_json, tipo_telhado, distancia_quadro, anexo_conta_url, potencia_kwp, qtd_modulos, modelo_modulo, modelo_inversor, custo_total, margem, preco_venda, status, criado_em, cliente:clientes (nome, documento, telefone)'
 
 function normalizar(row: Record<string, unknown>): ProjetoSolar {
   const cliente = Array.isArray(row.cliente) ? row.cliente[0] : row.cliente
@@ -47,6 +49,7 @@ function normalizar(row: Record<string, unknown>): ProjetoSolar {
     cliente_id: row.cliente_id as string,
     cliente_nome: (cliente as { nome?: string } | null)?.nome ?? '—',
     cliente_documento: (cliente as { documento?: string } | null)?.documento ?? null,
+    cliente_telefone: (cliente as { telefone?: string } | null)?.telefone ?? null,
     uc: (row.uc as string) ?? null,
     concessionaria: (row.concessionaria as string) ?? null,
     tipo_ligacao: (row.tipo_ligacao as TipoLigacao) ?? 'monofasica',

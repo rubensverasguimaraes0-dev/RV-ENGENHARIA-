@@ -34,9 +34,14 @@ export default async function PaginaSolar() {
         titulo="Energia Solar"
         subtitulo="Do consumo da conta de energia à proposta pronta"
         acoes={
-          <Link href="/solar/calculadora" className="botao botao-neutro">
-            Calculadora rápida
-          </Link>
+          <>
+            <Link href="/solar/expresso" className="botao botao-primario">
+              Proposta expressa
+            </Link>
+            <Link href="/solar/calculadora" className="botao botao-neutro">
+              Calculadora
+            </Link>
+          </>
         }
       />
 
@@ -53,7 +58,10 @@ export default async function PaginaSolar() {
       <div className="grid gap-3 lg:grid-cols-[1fr_340px]">
         <Cartao titulo={`Projetos (${projetos.length})`}>
           {projetos.length === 0 ? (
-            <Vazio>Nenhum projeto solar. Crie o primeiro ao lado.</Vazio>
+            <Vazio acao={{ href: '/solar/expresso', rotulo: 'Proposta expressa' }}>
+              Nenhum projeto solar ainda. Pela proposta expressa, a conta do cliente entra e a
+              proposta sai pronta numa tela só.
+            </Vazio>
           ) : (
             <div className="rolagem">
               <table className="tabela">

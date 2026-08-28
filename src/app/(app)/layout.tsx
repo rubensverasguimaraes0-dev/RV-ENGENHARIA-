@@ -11,12 +11,15 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
     <ProvedorDeAvisos>
     <div className="min-h-screen flex flex-col">
       <header className="bg-rv-900 text-white nao-imprimir">
-        <div className="mx-auto max-w-6xl px-3 h-12 flex items-center justify-between gap-3">
-          <Link href="/" className="flex items-center gap-2 font-bold">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded bg-white text-rv-800 text-xs font-black">
+        <div className="mx-auto max-w-6xl px-3 h-14 flex items-center justify-between gap-3">
+          <Link href="/" className="flex items-center gap-2.5 font-bold">
+            {/* Monograma do topo: fundo branco cheio contra o azul escuro da
+                barra, e o texto no azul mais fechado da paleta — e o par de
+                maior contraste que a identidade permite. */}
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-white text-rv-900 text-base font-black tracking-tight shadow-sm">
               RV
             </span>
-            <span className="hidden sm:inline">RV Engenharia</span>
+            <span className="hidden sm:inline text-[15px]">RV Engenharia</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
             <span className="hidden sm:inline text-rv-100">
