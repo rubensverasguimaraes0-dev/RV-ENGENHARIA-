@@ -52,7 +52,11 @@ Sem as variáveis de ambiente o app abre em `/configurar`, com o passo a passo n
 ### Configurar o Supabase
 
 1. Crie um projeto em [supabase.com](https://supabase.com).
-2. No **SQL Editor**, execute na ordem os arquivos de `supabase/migrations`:
+2. No **SQL Editor**, cole o arquivo **`supabase/instalar.sql`** inteiro e clique em RUN. Ele faz
+   tudo de uma vez — tabelas, permissões, parâmetros, buckets e a trigger de usuários — dentro de
+   uma transação, e avisa se já tiver sido instalado.
+
+   Se preferir aplicar passo a passo, os arquivos de `supabase/migrations` fazem o mesmo, na ordem:
    - `0001_schema.sql` — tabelas, tipos e índices
    - `0002_rls.sql` — perfis, políticas de acesso, views seguras e funções de lançamento
    - `0003_seed.sql` — parâmetros e fornecedores já usados
@@ -60,7 +64,7 @@ Sem as variáveis de ambiente o app abre em `/configurar`, com o passo a passo n
    - `0005_servico_quantidade.sql` — quantidade e unidade no serviço do fechamento
    - `0006_orcamento.sql` — base de preços referenciais e complementos do orçamento
    - `0007_parametros_solar.sql` — parâmetros da cotação solar
-3. Ligue a trigger que cria o perfil quando um usuário nasce no Auth:
+3. (Já incluída em `instalar.sql`.) Se aplicou as migrations uma a uma, ligue a trigger:
 
    ```sql
    create trigger ao_criar_usuario
