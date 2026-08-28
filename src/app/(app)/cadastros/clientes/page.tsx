@@ -48,9 +48,9 @@ export default async function PaginaClientes({
       <div className="grid gap-3 lg:grid-cols-[1fr_360px]">
         <Cartao titulo={`Cadastrados (${clientes.length})`}>
           {clientes.length === 0 ? (
-            <Vazio>Nenhum cliente cadastrado ainda.</Vazio>
+            <Vazio>Nenhum cliente cadastrado ainda. Comece pelo cliente: a obra vem depois dele.</Vazio>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="rolagem">
               <table className="tabela">
                 <thead>
                   <tr>
@@ -85,13 +85,13 @@ export default async function PaginaClientes({
                       <td className="whitespace-nowrap">
                         <Link
                           href={`/cadastros/clientes?editar=${c.id}`}
-                          className="text-rv-700 underline text-xs"
+                          className="acao acao-neutra"
                         >
                           editar
                         </Link>
                         <form action={arquivarCliente} className="inline">
                           <input type="hidden" name="id" value={c.id} />
-                          <button className="text-erro-700 underline text-xs ml-2" type="submit">
+                          <button className="acao acao-perigo" type="submit">
                             arquivar
                           </button>
                         </form>

@@ -66,7 +66,7 @@ export default async function PaginaSemanas({ params }: { params: Promise<{ obra
                   <td className="whitespace-nowrap">
                     <Link
                       href={`/obras/${obraId}/semanas/${s.id}`}
-                      className="text-rv-700 underline text-xs"
+                      className="acao acao-neutra"
                     >
                       abrir
                     </Link>
@@ -74,7 +74,7 @@ export default async function PaginaSemanas({ params }: { params: Promise<{ obra
                       <form action={reabrirSemana} className="inline">
                         <input type="hidden" name="semana_id" value={s.id} />
                         <input type="hidden" name="obra_id" value={obraId} />
-                        <button className="text-alerta-700 underline text-xs ml-2" type="submit">
+                        <button className="acao acao-alerta" type="submit">
                           reabrir
                         </button>
                       </form>

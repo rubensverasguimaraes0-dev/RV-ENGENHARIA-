@@ -1,13 +1,15 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect, useRef } from 'react'
 import { useFormStatus } from 'react-dom'
 import type { EstadoForm } from '@/lib/form'
+import { useAvisos } from './avisos'
 
 export function BotaoSalvar({ rotulo = 'Salvar' }: { rotulo?: string }) {
   const { pending } = useFormStatus()
   return (
-    <button type="submit" className="botao botao-primario" disabled={pending}>
+    <button type="submit" className="botao botao-primario" disabled={pending} aria-busy={pending}>
+      {pending && <span className="girando" aria-hidden="true" />}
       {pending ? 'Salvando…' : rotulo}
     </button>
   )
@@ -30,6 +32,7 @@ export function FormularioAcao({
   rotuloBotao?: string
   aoConcluir?: (estado: EstadoForm) => void
 }) {
+  const { avisar } = useAvisos()
   const [estado, despachar] = useActionState(
     async (e: EstadoForm | null, f: FormData) => {
       const r = await acao(e, f)
@@ -39,13 +42,27 @@ export function FormularioAcao({
     null,
   )
 
+  // O retorno vira aviso no rodape, que aparece mesmo com o celular na mao.
+  // O erro continua tambem ao lado do botao, porque costuma exigir correcao
+  // num campo que esta ali perto.
+  const ultimo = useRef<EstadoForm | null>(null)
+  useEffect(() => {
+    if (!estado || estado === ultimo.current) return
+    ultimo.current = estado
+    if (estado.ok) avisar(estado.ok, 'ok')
+    else if (estado.erro) avisar(estado.erro, 'erro')
+  }, [estado, avisar])
+
   return (
     <form action={despachar} className={className}>
       {children}
       <div className="flex items-center gap-3 flex-wrap mt-3">
         <BotaoSalvar rotulo={rotuloBotao} />
-        {estado?.erro && <span className="text-sm text-erro-700 font-medium">{estado.erro}</span>}
-        {estado?.ok && <span className="text-sm text-ok-700 font-medium">{estado.ok}</span>}
+        {estado?.erro && (
+          <span className="text-sm text-erro-700 font-medium" role="alert">
+            {estado.erro}
+          </span>
+        )}
       </div>
     </form>
   )

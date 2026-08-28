@@ -74,7 +74,7 @@ export default async function PaginaAlmoxarifado({
             {resumo.grupos.length === 0 ? (
               <Vazio>Nenhum item no almoxarifado desta obra.</Vazio>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="rolagem">
                 <table className="tabela">
                   <thead>
                     <tr>
@@ -140,7 +140,7 @@ export default async function PaginaAlmoxarifado({
                         <form action={estornarSaida}>
                           <input type="hidden" name="id" value={s.id} />
                           <input type="hidden" name="obra_id" value={obraId} />
-                          <button className="text-erro-700 underline text-xs" type="submit">
+                          <button className="acao acao-perigo" type="submit">
                             estornar
                           </button>
                         </form>
@@ -220,13 +220,13 @@ function FragmentoCategoria({
             {i.valor_cobrado > 0 ? <Moeda valor={i.valor_cobrado} /> : '—'}
           </td>
           <td className="whitespace-nowrap text-xs">
-            <Link href={`/obras/${obraId}/almoxarifado?editar=${i.id}`} className="text-rv-700 underline">
+            <Link href={`/obras/${obraId}/almoxarifado?editar=${i.id}`} className="acao acao-neutra">
               editar
             </Link>
             <form action={arquivarItem} className="inline">
               <input type="hidden" name="id" value={i.id} />
               <input type="hidden" name="obra_id" value={obraId} />
-              <button className="text-erro-700 underline ml-1" type="submit">
+              <button className="acao acao-perigo" type="submit">
                 remover
               </button>
             </form>

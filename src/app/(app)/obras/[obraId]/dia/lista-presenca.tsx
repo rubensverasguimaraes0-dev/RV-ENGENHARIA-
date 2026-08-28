@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { marcarPresenca, removerPresenca, salvarQuentinha } from './acoes'
+import { useAvisos } from '@/components/avisos'
 import { formatarMoeda, formatarValor, lerMoeda } from '@/lib/format'
 import type { TipoDiaria } from '@/lib/domain/tipos'
 
@@ -42,12 +43,21 @@ export function ListaPresenca({
   const [pendente, iniciar] = useTransition()
   const [erro, setErro] = useState<string | null>(null)
   const [emFoco, setEmFoco] = useState<string | null>(null)
+  // Qual linha esta gravando agora. Sem isto, um toque trava a lista inteira
+  // sem dizer em quem — e a pessoa toca de novo.
+  const [gravando, setGravando] = useState<string | null>(null)
+  const { avisar } = useAvisos()
 
-  function agir(fn: () => Promise<{ erro?: string; ok?: string }>) {
+  function agir(id: string, fn: () => Promise<{ erro?: string; ok?: string }>) {
     setErro(null)
+    setGravando(id)
     iniciar(async () => {
       const r = await fn()
-      if (r.erro) setErro(r.erro)
+      if (r.erro) {
+        setErro(r.erro)
+        avisar(r.erro, 'erro')
+      }
+      setGravando(null)
       router.refresh()
     })
   }
@@ -72,7 +82,7 @@ export function ListaPresenca({
                 type="button"
                 disabled={pendente || semanaFechada}
                 onClick={() =>
-                  agir(() =>
+                  agir(p.id, () =>
                     p.presente
                       ? removerPresenca({ obraId, funcionarioId: p.id, data })
                       : marcarPresenca({
@@ -83,15 +93,22 @@ export function ListaPresenca({
                         }),
                   )
                 }
-                className={`h-11 w-11 shrink-0 rounded-lg border-2 text-lg font-bold ${
+                className={`h-12 w-12 shrink-0 rounded-lg border-2 text-xl font-bold grid place-items-center transition-colors ${
                   p.presente
                     ? 'bg-ok-700 border-ok-700 text-white'
                     : 'bg-white border-slate-300 text-slate-400'
-                }`}
+                } ${gravando === p.id ? 'opacity-70' : ''}`}
                 aria-pressed={p.presente}
+                aria-busy={gravando === p.id}
                 aria-label={p.presente ? `Remover ${p.nome}` : `Marcar ${p.nome}`}
               >
-                {p.presente ? '✓' : '+'}
+                {gravando === p.id ? (
+                  <span className="girando" style={{ borderTopColor: p.presente ? '#fff' : '#0b4f8a' }} />
+                ) : p.presente ? (
+                  '✓'
+                ) : (
+                  '+'
+                )}
               </button>
 
               <div className="min-w-0 flex-1">
@@ -118,7 +135,7 @@ export function ListaPresenca({
                       title={o.titulo}
                       disabled={pendente || semanaFechada}
                       onClick={() =>
-                        agir(() =>
+                        agir(p.id, () =>
                           marcarPresenca({
                             obraId,
                             funcionarioId: p.id,
@@ -128,7 +145,7 @@ export function ListaPresenca({
                           }),
                         )
                       }
-                      className={`h-9 px-2 rounded border text-xs font-bold ${
+                      className={`h-10 min-w-[3rem] px-2 rounded border text-xs font-bold ${
                         p.tipo_diaria === o.valor
                           ? 'bg-rv-800 border-rv-800 text-white'
                           : 'bg-white border-slate-300 text-slate-600'
@@ -153,7 +170,7 @@ export function ListaPresenca({
                     inicial={p.valor_vale}
                     onSalvar={(centavos) => {
                       setEmFoco(null)
-                      agir(() =>
+                      agir(p.id, () =>
                         marcarPresenca({
                           obraId,
                           funcionarioId: p.id,
@@ -168,7 +185,7 @@ export function ListaPresenca({
                 ) : (
                   <button
                     type="button"
-                    className="text-rv-700 underline"
+                    className="acao acao-neutra"
                     disabled={semanaFechada}
                     onClick={() => setEmFoco(p.id)}
                   >
@@ -182,7 +199,7 @@ export function ListaPresenca({
       </ul>
 
       {mostrarValores && (
-        <div className="mt-3 border-t border-slate-300 pt-2 text-sm flex flex-wrap gap-4">
+        <div className="mt-3 border-t-2 border-rv-800 pt-2 text-sm flex flex-wrap gap-4 bg-rv-50 -mx-3 -mb-3 px-3 py-2">
           <span>
             Presentes: <strong>{presentes.length}</strong>
           </span>

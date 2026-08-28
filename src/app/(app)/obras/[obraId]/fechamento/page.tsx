@@ -116,7 +116,7 @@ export default async function PaginaFechamento({
                 </form>
               </>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="rolagem">
                 <table className="tabela">
                   <thead>
                     <tr>
@@ -291,13 +291,13 @@ function GrupoLinhas({
             <Moeda valor={s.valor_liquido} />
           </td>
           <td className="whitespace-nowrap text-xs">
-            <Link href={`/obras/${obraId}/fechamento?editar=${s.id}`} className="text-rv-700 underline">
+            <Link href={`/obras/${obraId}/fechamento?editar=${s.id}`} className="acao acao-neutra">
               editar
             </Link>
             <form action={arquivarServicoExecutado} className="inline">
               <input type="hidden" name="id" value={s.id} />
               <input type="hidden" name="obra_id" value={obraId} />
-              <button className="text-erro-700 underline ml-1" type="submit">
+              <button className="acao acao-perigo" type="submit">
                 remover
               </button>
             </form>

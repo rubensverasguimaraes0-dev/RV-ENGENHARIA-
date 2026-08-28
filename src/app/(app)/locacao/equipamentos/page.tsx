@@ -45,7 +45,7 @@ export default async function PaginaEquipamentos({
           {equipamentos.length === 0 ? (
             <Vazio>Nenhum equipamento cadastrado. Importe a tabela por CSV ao lado.</Vazio>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="rolagem">
               <table className="tabela">
                 <thead>
                   <tr>
@@ -85,13 +85,13 @@ export default async function PaginaEquipamentos({
                           <td className="whitespace-nowrap text-xs">
                             <Link
                               href={`/locacao/equipamentos?editar=${e.id}`}
-                              className="text-rv-700 underline"
+                              className="acao acao-neutra"
                             >
                               editar
                             </Link>
                             <form action={arquivarEquipamento} className="inline">
                               <input type="hidden" name="id" value={e.id} />
-                              <button className="text-erro-700 underline ml-1" type="submit">
+                              <button className="acao acao-perigo" type="submit">
                                 remover
                               </button>
                             </form>

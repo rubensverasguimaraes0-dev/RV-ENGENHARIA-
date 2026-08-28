@@ -2,11 +2,13 @@ import Link from 'next/link'
 import { exigirUsuario } from '@/lib/supabase/sessao'
 import { sair } from '@/app/login/acoes'
 import { NavegacaoPrincipal } from '@/components/navegacao'
+import { ProvedorDeAvisos } from '@/components/avisos'
 
 export default async function LayoutApp({ children }: { children: React.ReactNode }) {
   const usuario = await exigirUsuario()
 
   return (
+    <ProvedorDeAvisos>
     <div className="min-h-screen flex flex-col">
       <header className="bg-rv-900 text-white nao-imprimir">
         <div className="mx-auto max-w-6xl px-3 h-12 flex items-center justify-between gap-3">
@@ -40,5 +42,6 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
         Eng. Civil Rubens Veras Guimarães, CREA-PI 35900
       </footer>
     </div>
+    </ProvedorDeAvisos>
   )
 }

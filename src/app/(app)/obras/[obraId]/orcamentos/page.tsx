@@ -33,7 +33,7 @@ export default async function PaginaOrcamentos({ params }: { params: Promise<{ o
       <div className="grid gap-3 lg:grid-cols-[1fr_320px]">
         <Cartao titulo={`Orçamentos da obra (${orcamentos.length})`}>
           {orcamentos.length === 0 ? (
-            <Vazio>Nenhum orçamento nesta obra.</Vazio>
+            <Vazio>Nenhum orçamento nesta obra. Crie ao lado — o rápido serve para um serviço dentro da obra; o completo, para obra nova.</Vazio>
           ) : (
             <table className="tabela">
               <thead>
@@ -92,7 +92,7 @@ export default async function PaginaOrcamentos({ params }: { params: Promise<{ o
                         <form action={arquivarOrcamento}>
                           <input type="hidden" name="id" value={o.id} />
                           <input type="hidden" name="obra_id" value={obraId} />
-                          <button className="text-erro-700 underline text-xs" type="submit">
+                          <button className="acao acao-perigo" type="submit">
                             arquivar
                           </button>
                         </form>

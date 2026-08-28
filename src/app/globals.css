@@ -20,7 +20,9 @@
   --color-erro-700: #9b1c1c;
   --color-erro-100: #fde4e4;
 
-  --font-sans: ui-sans-serif, system-ui, 'Segoe UI', Roboto, Arial, sans-serif;
+  /* IBM Plex Sans vem de next/font; a pilha de reserva segura o texto enquanto
+     ela carrega e se algo falhar. */
+  --font-sans: var(--fonte-app), ui-sans-serif, system-ui, 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
 html {
@@ -32,6 +34,17 @@ body {
   color: #10202e;
   font-family: var(--font-sans);
   font-size: 15px;
+  /* Instalado no iPhone o app ocupa a tela inteira: sem isto o conteudo fica
+     sob o notch e sob a barra inferior. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+           env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* Numeral tabular em toda coluna de dinheiro e quantidade: os algarismos ficam
+   alinhados um debaixo do outro, e a coluna para de "dancar" ao atualizar. */
+.tabela .num,
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
 
 /* --- Tabela padrao do app e dos documentos --------------------------------- */
@@ -151,6 +164,133 @@ body {
   letter-spacing: 0.02em;
   padding: 7px 12px;
   border-radius: 7px 7px 0 0;
+}
+
+
+/* --- Tabela larga no celular ----------------------------------------------
+   Dezesseis telas tem tabela mais larga que a tela do celular. Antes, a
+   rolagem era muda: ninguem descobria que havia coluna escondida a direita.
+   Agora ha sombra na borda enquanto sobrar conteudo, e o cabecalho gruda no
+   topo para nao se perder o nome da coluna no meio da lista. */
+.rolagem {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  /* a sombra so aparece do lado em que ainda ha conteudo */
+  background:
+    linear-gradient(to right, #fff 30%, rgba(255, 255, 255, 0)) left center,
+    linear-gradient(to left, #fff 30%, rgba(255, 255, 255, 0)) right center,
+    radial-gradient(farthest-side at 0 50%, rgba(7, 52, 87, 0.16), transparent) left center,
+    radial-gradient(farthest-side at 100% 50%, rgba(7, 52, 87, 0.16), transparent) right center;
+  background-repeat: no-repeat;
+  background-size: 28px 100%, 28px 100%, 12px 100%, 12px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+.rolagem .tabela thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* --- Alvo de toque ---------------------------------------------------------
+   As acoes de linha ("editar", "remover") eram texto de 12px: alvo pequeno
+   demais para dedo em obra. O texto continua discreto, mas a area tocavel
+   passa a ter altura de dedo. */
+.acao {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 2px 6px;
+  margin: -2px 0;
+  border-radius: 4px;
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.acao:hover { background: var(--color-rv-50); }
+.acao:focus-visible { outline: 2px solid var(--color-rv-600); outline-offset: 1px; }
+.acao-neutra { color: var(--color-rv-700); }
+.acao-perigo { color: var(--color-erro-700); }
+.acao-alerta { color: var(--color-alerta-700); }
+
+/* --- Avisos de retorno ----------------------------------------------------- */
+.avisos {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+.aviso-balao {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 30rem;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(7, 52, 87, 0.28);
+  animation: subir 0.18s ease-out;
+}
+@keyframes subir {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.aviso-ok   { background: var(--color-ok-700); }
+.aviso-erro { background: var(--color-erro-700); }
+.aviso-marca {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+.aviso-fechar {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.75;
+  padding: 0 2px;
+}
+.aviso-fechar:hover { opacity: 1; }
+
+/* --- Trabalho em andamento ------------------------------------------------- */
+.girando {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 999px;
+  animation: girar 0.7s linear infinite;
+}
+@keyframes girar { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .aviso-balao { animation: none; }
+  .girando { animation-duration: 2s; }
 }
 
 /* --- Documentos A4 --------------------------------------------------------- */

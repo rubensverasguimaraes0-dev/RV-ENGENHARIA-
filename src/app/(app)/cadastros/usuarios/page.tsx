@@ -73,7 +73,7 @@ export default async function PaginaUsuarios() {
                                   <form action={desvincularObra}>
                                     <input type="hidden" name="usuario_id" value={u.id} />
                                     <input type="hidden" name="obra_id" value={v.obra_id} />
-                                    <button className="text-erro-700 underline" type="submit">
+                                    <button className="acao acao-perigo" type="submit">
                                       remover
                                     </button>
                                   </form>

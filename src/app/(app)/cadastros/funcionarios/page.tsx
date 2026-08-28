@@ -44,9 +44,9 @@ export default async function PaginaFuncionarios({
       <div className="grid gap-3 lg:grid-cols-[1fr_340px]">
         <Cartao titulo={`Equipe (${pessoas.length})`}>
           {pessoas.length === 0 ? (
-            <Vazio>Nenhum funcionário cadastrado ainda.</Vazio>
+            <Vazio>Nenhum funcionário cadastrado ainda. Sem equipe cadastrada não há o que lançar no dia.</Vazio>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="rolagem">
               <table className="tabela">
                 <thead>
                   <tr>
@@ -89,13 +89,13 @@ export default async function PaginaFuncionarios({
                       <td className="whitespace-nowrap">
                         <Link
                           href={`/cadastros/funcionarios?editar=${f.id}`}
-                          className="text-rv-700 underline text-xs"
+                          className="acao acao-neutra"
                         >
                           editar
                         </Link>
                         <form action={arquivarFuncionario} className="inline">
                           <input type="hidden" name="id" value={f.id} />
-                          <button className="text-erro-700 underline text-xs ml-2" type="submit">
+                          <button className="acao acao-perigo" type="submit">
                             arquivar
                           </button>
                         </form>

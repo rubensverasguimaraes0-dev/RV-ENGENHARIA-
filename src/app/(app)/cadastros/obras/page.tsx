@@ -68,9 +68,11 @@ export default async function PaginaObrasCadastro({
         <div className="space-y-3">
           <Cartao titulo={`Obras (${obras.length})`}>
             {obras.length === 0 ? (
-              <Vazio>Nenhuma obra cadastrada ainda.</Vazio>
+              <Vazio acao={{ href: "/cadastros/clientes", rotulo: "Cadastrar cliente" }}>
+                Nenhuma obra cadastrada ainda. Toda obra pertence a um cliente.
+              </Vazio>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="rolagem">
                 <table className="tabela">
                   <thead>
                     <tr>
@@ -115,13 +117,13 @@ export default async function PaginaObrasCadastro({
                           <td className="whitespace-nowrap">
                             <Link
                               href={`/cadastros/obras?editar=${o.id}`}
-                              className="text-rv-700 underline text-xs"
+                              className="acao acao-neutra"
                             >
                               editar
                             </Link>
                             <form action={arquivarObra} className="inline">
                               <input type="hidden" name="id" value={o.id} />
-                              <button className="text-erro-700 underline text-xs ml-2" type="submit">
+                              <button className="acao acao-perigo" type="submit">
                                 arquivar
                               </button>
                             </form>
@@ -159,7 +161,7 @@ export default async function PaginaObrasCadastro({
                         <td>
                           <form action={arquivarLocal}>
                             <input type="hidden" name="id" value={l.id} />
-                            <button className="text-erro-700 underline text-xs" type="submit">
+                            <button className="acao acao-perigo" type="submit">
                               remover
                             </button>
                           </form>

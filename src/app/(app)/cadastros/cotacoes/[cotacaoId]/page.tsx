@@ -116,7 +116,7 @@ export default async function DetalheCotacao({
             {itens.length === 0 ? (
               <Vazio>Nenhum item. Lance ao lado, ou importe por CSV.</Vazio>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="rolagem">
                 <table className="tabela">
                   <thead>
                     <tr>
@@ -154,7 +154,7 @@ export default async function DetalheCotacao({
                           <form action={arquivarItemCotacao}>
                             <input type="hidden" name="id" value={i.id} />
                             <input type="hidden" name="cotacao_id" value={cotacaoId} />
-                            <button className="text-erro-700 underline text-xs" type="submit">
+                            <button className="acao acao-perigo" type="submit">
                               remover
                             </button>
                           </form>
@@ -237,7 +237,7 @@ export default async function DetalheCotacao({
               </form>
 
               {outra && comparativo.length > 0 && (
-                <div className="overflow-x-auto">
+                <div className="rolagem">
                   <table className="tabela">
                     <thead>
                       <tr>

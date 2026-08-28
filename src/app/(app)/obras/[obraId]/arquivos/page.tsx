@@ -103,7 +103,7 @@ export default async function PaginaArquivos({
                               href={a.url}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-rv-700 underline"
+                              className="acao acao-neutra"
                             >
                               abrir
                             </a>
@@ -113,7 +113,7 @@ export default async function PaginaArquivos({
                           <form action={arquivarArquivo} className="inline">
                             <input type="hidden" name="id" value={a.id} />
                             <input type="hidden" name="obra_id" value={obraId} />
-                            <button className="text-erro-700 underline ml-2" type="submit">
+                            <button className="acao acao-perigo" type="submit">
                               remover
                             </button>
                           </form>
@@ -168,7 +168,7 @@ export default async function PaginaArquivos({
                                     download
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="text-rv-700 underline"
+                                    className="acao acao-neutra"
                                   >
                                     baixar em alta
                                   </a>
@@ -177,7 +177,7 @@ export default async function PaginaArquivos({
                                   <input type="hidden" name="id" value={f.id} />
                                   <input type="hidden" name="obra_id" value={obraId} />
                                   <input type="hidden" name="momento" value={f.momento ?? ''} />
-                                  <button className="text-rv-700 underline" type="submit">
+                                  <button className="acao acao-neutra" type="submit">
                                     {f.momento === 'antes'
                                       ? 'marcar depois'
                                       : f.momento === 'depois'
@@ -188,7 +188,7 @@ export default async function PaginaArquivos({
                                 <form action={arquivarArquivo} className="inline">
                                   <input type="hidden" name="id" value={f.id} />
                                   <input type="hidden" name="obra_id" value={obraId} />
-                                  <button className="text-erro-700 underline" type="submit">
+                                  <button className="acao acao-perigo" type="submit">
                                     remover
                                   </button>
                                 </form>

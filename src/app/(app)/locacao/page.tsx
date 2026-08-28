@@ -77,9 +77,12 @@ export default async function PaginaLocacao() {
       <div className="grid gap-3 lg:grid-cols-[1fr_340px]">
         <Cartao titulo={`Contratos (${contratos.length})`}>
           {contratos.length === 0 ? (
-            <Vazio>Nenhum contrato de locação. Abra o primeiro ao lado.</Vazio>
+            <Vazio acao={{ href: "/locacao/equipamentos", rotulo: "Ver equipamentos" }}>
+              Nenhum contrato de locação. Os equipamentos precisam estar cadastrados com a tabela de
+              preços antes do primeiro contrato.
+            </Vazio>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="rolagem">
               <table className="tabela">
                 <thead>
                   <tr>
@@ -137,7 +140,7 @@ export default async function PaginaLocacao() {
                         {c.status_atual !== 'devolvido' && c.status_atual !== 'cancelado' && (
                           <form action={cancelarContrato}>
                             <input type="hidden" name="id" value={c.id} />
-                            <button className="text-erro-700 underline text-xs" type="submit">
+                            <button className="acao acao-perigo" type="submit">
                               cancelar
                             </button>
                           </form>
@@ -155,7 +158,7 @@ export default async function PaginaLocacao() {
           {equipamentos.length === 0 ? (
             <p className="text-sm text-slate-600">
               Cadastre os equipamentos primeiro em{' '}
-              <Link href="/locacao/equipamentos" className="text-rv-700 underline">
+              <Link href="/locacao/equipamentos" className="acao acao-neutra">
                 Equipamentos
               </Link>
               .

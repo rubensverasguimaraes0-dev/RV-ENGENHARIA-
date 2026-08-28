@@ -112,7 +112,7 @@ export default async function DetalheProjetoSolar({
             {cotacao.itens.length === 0 ? (
               <Vazio>Sem itens. Verifique a base de preços.</Vazio>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="rolagem">
                 <table className="tabela">
                   <thead>
                     <tr>

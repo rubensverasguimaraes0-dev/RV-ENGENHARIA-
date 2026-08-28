@@ -76,7 +76,7 @@ export default async function PaginaMedicoes({
                 Nenhum serviço cadastrado. Ex.: forro a R$ 90,00/m², sanca a R$ 90,00/m linear.
               </Vazio>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="rolagem">
                 <table className="tabela">
                   <thead>
                     <tr>
@@ -129,14 +129,14 @@ export default async function PaginaMedicoes({
                         <td className="whitespace-nowrap text-xs">
                           <Link
                             href={`/obras/${obraId}/medicoes?editar=${s.id}`}
-                            className="text-rv-700 underline"
+                            className="acao acao-neutra"
                           >
                             editar
                           </Link>
                           <form action={arquivarServico} className="inline">
                             <input type="hidden" name="id" value={s.id} />
                             <input type="hidden" name="obra_id" value={obraId} />
-                            <button className="text-erro-700 underline ml-1" type="submit">
+                            <button className="acao acao-perigo" type="submit">
                               remover
                             </button>
                           </form>
@@ -190,7 +190,7 @@ export default async function PaginaMedicoes({
                         <form action={estornarMedicao}>
                           <input type="hidden" name="id" value={m.id} />
                           <input type="hidden" name="obra_id" value={obraId} />
-                          <button className="text-erro-700 underline text-xs" type="submit">
+                          <button className="acao acao-perigo" type="submit">
                             estornar
                           </button>
                         </form>
@@ -287,7 +287,7 @@ export default async function PaginaMedicoes({
             {(cadastroTerceiros ?? []).length === 0 ? (
               <p className="text-sm text-slate-600">
                 Cadastre um terceiro primeiro em{' '}
-                <Link href="/cadastros/terceiros" className="text-rv-700 underline">
+                <Link href="/cadastros/terceiros" className="acao acao-neutra">
                   Cadastros → Terceiros
                 </Link>
                 .

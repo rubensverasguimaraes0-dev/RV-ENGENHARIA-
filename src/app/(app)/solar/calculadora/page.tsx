@@ -49,7 +49,7 @@ export default async function PaginaSolar() {
       />
       <p className="mt-3 text-xs text-slate-600 max-w-3xl">
         Para montar a cotação com a base de preços e gerar a proposta ao cliente, crie um projeto
-        em <Link href="/solar" className="text-rv-700 underline">Projetos salvos</Link>.
+        em <Link href="/solar" className="acao acao-neutra">Projetos salvos</Link>.
       </p>
     </>
   )

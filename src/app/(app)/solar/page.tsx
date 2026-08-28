@@ -55,7 +55,7 @@ export default async function PaginaSolar() {
           {projetos.length === 0 ? (
             <Vazio>Nenhum projeto solar. Crie o primeiro ao lado.</Vazio>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="rolagem">
               <table className="tabela">
                 <thead>
                   <tr>
@@ -98,7 +98,7 @@ export default async function PaginaSolar() {
                       <td>
                         <form action={arquivarProjetoSolar}>
                           <input type="hidden" name="id" value={p.id} />
-                          <button className="text-erro-700 underline text-xs" type="submit">
+                          <button className="acao acao-perigo" type="submit">
                             arquivar
                           </button>
                         </form>
@@ -115,7 +115,7 @@ export default async function PaginaSolar() {
           {(clientesData ?? []).length === 0 ? (
             <p className="text-sm text-slate-600">
               Cadastre um cliente primeiro em{' '}
-              <Link href="/cadastros/clientes" className="text-rv-700 underline">
+              <Link href="/cadastros/clientes" className="acao acao-neutra">
                 Cadastros → Clientes
               </Link>
               .

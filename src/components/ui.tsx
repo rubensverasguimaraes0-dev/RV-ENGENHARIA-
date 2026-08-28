@@ -84,11 +84,26 @@ export function Etiqueta({
   return <span className={`etiqueta etiqueta-${tom}`}>{children}</span>
 }
 
-export function Vazio({ children }: { children: React.ReactNode }) {
+/**
+ * Estado vazio. Alem de dizer que nao ha nada, oferece o caminho de saida —
+ * senao a pessoa fica olhando a tela sem saber qual e o proximo toque.
+ */
+export function Vazio({
+  children,
+  acao,
+}: {
+  children: React.ReactNode
+  acao?: { href: string; rotulo: string }
+}) {
   return (
-    <p className="text-sm text-slate-500 border border-dashed border-slate-300 rounded p-4 text-center">
-      {children}
-    </p>
+    <div className="border border-dashed border-slate-300 rounded p-5 text-center bg-slate-50/60">
+      <p className="text-sm text-slate-600 max-w-md mx-auto">{children}</p>
+      {acao && (
+        <Link href={acao.href} className="botao botao-primario mt-3">
+          {acao.rotulo}
+        </Link>
+      )}
+    </div>
   )
 }
 

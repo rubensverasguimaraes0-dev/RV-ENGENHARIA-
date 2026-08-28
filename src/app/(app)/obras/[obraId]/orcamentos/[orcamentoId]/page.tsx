@@ -85,7 +85,7 @@ export default async function EditorOrcamento({
             {itens.length === 0 ? (
               <Vazio>Nenhum item ainda. Adicione ao lado.</Vazio>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="rolagem">
                 <table className="tabela">
                   <thead>
                     <tr>
@@ -134,7 +134,7 @@ export default async function EditorOrcamento({
                         <td className="whitespace-nowrap text-xs">
                           <Link
                             href={`/obras/${obraId}/orcamentos/${orcamentoId}?editar=${i.id}`}
-                            className="text-rv-700 underline"
+                            className="acao acao-neutra"
                           >
                             editar
                           </Link>
@@ -142,7 +142,7 @@ export default async function EditorOrcamento({
                             <input type="hidden" name="id" value={i.id} />
                             <input type="hidden" name="orcamento_id" value={orcamentoId} />
                             <input type="hidden" name="obra_id" value={obraId} />
-                            <button className="text-erro-700 underline ml-1" type="submit">
+                            <button className="acao acao-perigo" type="submit">
                               remover
                             </button>
                           </form>
@@ -260,7 +260,7 @@ export default async function EditorOrcamento({
               {buscar !== undefined && referencias.length === 0 && (
                 <Vazio>
                   Nada encontrado. Importe as tabelas em{' '}
-                  <Link href="/cadastros/precos-referencia" className="text-rv-700 underline">
+                  <Link href="/cadastros/precos-referencia" className="acao acao-neutra">
                     Cadastros → Preços referenciais
                   </Link>
                   .
@@ -294,7 +294,7 @@ export default async function EditorOrcamento({
                             <input type="hidden" name="preco_id" value={r.id} />
                             <input type="hidden" name="orcamento_id" value={orcamentoId} />
                             <input type="hidden" name="obra_id" value={obraId} />
-                            <button className="text-rv-700 underline text-xs" type="submit">
+                            <button className="acao acao-neutra" type="submit">
                               usar
                             </button>
                           </form>

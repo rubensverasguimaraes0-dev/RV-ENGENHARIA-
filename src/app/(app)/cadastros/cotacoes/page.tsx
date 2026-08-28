@@ -76,7 +76,7 @@ export default async function PaginaCotacoes({
                 Nenhum item cotado ainda. Registre uma cotação ao lado e lance os itens.
               </Vazio>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="rolagem">
                 <table className="tabela">
                   <thead>
                     <tr>
@@ -191,13 +191,13 @@ export default async function PaginaCotacoes({
                           <form action={alternarBase} className="inline">
                             <input type="hidden" name="id" value={c.id} />
                             <input type="hidden" name="base" value={String(c.base)} />
-                            <button className="text-rv-700 underline" type="submit">
+                            <button className="acao acao-neutra" type="submit">
                               {c.base ? 'tirar base' : 'marcar base'}
                             </button>
                           </form>
                           <form action={arquivarCotacao} className="inline">
                             <input type="hidden" name="id" value={c.id} />
-                            <button className="text-erro-700 underline ml-2" type="submit">
+                            <button className="acao acao-perigo" type="submit">
                               arquivar
                             </button>
                           </form>
@@ -215,7 +215,7 @@ export default async function PaginaCotacoes({
           {(fornecedoresData ?? []).length === 0 ? (
             <p className="text-sm text-slate-600">
               Cadastre um fornecedor primeiro em{' '}
-              <Link href="/cadastros/fornecedores" className="text-rv-700 underline">
+              <Link href="/cadastros/fornecedores" className="acao acao-neutra">
                 Cadastros → Fornecedores
               </Link>
               .

@@ -158,7 +158,7 @@ export default async function PaginaNotas({
           {notas.length === 0 ? (
             <Vazio>Nenhuma nota lançada neste período.</Vazio>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="rolagem">
               <table className="tabela">
                 <thead>
                   <tr>
@@ -241,7 +241,7 @@ export default async function PaginaNotas({
                             <input type="hidden" name="id" value={n.id} />
                             <input type="hidden" name="obra_id" value={obraId} />
                             <input type="hidden" name="conferida" value={String(n.conferida)} />
-                            <button className="text-rv-700 underline" type="submit">
+                            <button className="acao acao-neutra" type="submit">
                               {n.conferida ? 'desmarcar' : 'conferir'}
                             </button>
                           </form>
@@ -257,14 +257,14 @@ export default async function PaginaNotas({
                             <input type="hidden" name="id" value={n.id} />
                             <input type="hidden" name="obra_id" value={obraId} />
                             <input type="hidden" name="a_confirmar" value={String(n.a_confirmar)} />
-                            <button className="text-alerta-700 underline" type="submit">
+                            <button className="acao acao-alerta" type="submit">
                               {n.a_confirmar ? 'confirmar local' : 'a confirmar'}
                             </button>
                           </form>
                           <form action={arquivarNota}>
                             <input type="hidden" name="id" value={n.id} />
                             <input type="hidden" name="obra_id" value={obraId} />
-                            <button className="text-erro-700 underline" type="submit">
+                            <button className="acao acao-perigo" type="submit">
                               arquivar
                             </button>
                           </form>

@@ -74,7 +74,7 @@ export default async function PaginaPrecosReferencia({
                       <td>
                         <form action={limparBase}>
                           <input type="hidden" name="base" value={base} />
-                          <button className="text-erro-700 underline text-xs" type="submit">
+                          <button className="acao acao-perigo" type="submit">
                             limpar base
                           </button>
                         </form>
@@ -102,7 +102,7 @@ export default async function PaginaPrecosReferencia({
             {precos.length === 0 ? (
               <Vazio>Nada encontrado.</Vazio>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="rolagem">
                 <table className="tabela">
                   <thead>
                     <tr>
