@@ -46,7 +46,22 @@ Para trocar depois, é só preencher `empresa_logo_url` em Cadastros → Parâme
 passa a mandar em todo lugar. Se esse endereço um dia falhar, o app volta para a logo que veio
 com ele em vez de gerar documento sem marca.
 
-**As tabelas de preço.** Três bases entram por CSV e ainda estão vazias:
+**As tabelas de preço.** São dados públicos, mas **esta sessão não alcança os sites do governo**:
+o proxy de rede recusa `caixa.gov.br`, `dnit.gov.br` e `cehop.se.gov.br` (403 na conexão). Consigo
+pesquisar e ler resumos, não baixar arquivo. Então o caminho é: você baixa e **anexa o arquivo na
+conversa** — daí eu converto para o formato do importador, e ensino o app a ler o arquivo original
+para os meses seguintes serem só um envio.
+
+Duas coisas que valem saber antes de baixar:
+
+- **Desonerado ou não desonerado.** O SINAPI publica as duas versões, e a diferença aparece em
+  todo preço com mão de obra. Para obra privada, o usual é a **não desonerada**; a decisão é sua,
+  como responsável técnico.
+- **ORSE é a tabela de Sergipe** (CEHOP/SE) — não existe "ORSE do Piauí". Ela costuma entrar como
+  complemento, por ter composições que o SINAPI não tem, mas os preços são da realidade sergipana.
+  O campo `uf` do importador registra isso.
+
+Três bases entram por CSV e ainda estão vazias:
 
 - SINAPI, ORSE e SICRO do Piauí, em Cadastros → Preços referenciais;
 - as cotações dos fornecedores, em Cadastros → Base de preços — é ela que alimenta a cotação
