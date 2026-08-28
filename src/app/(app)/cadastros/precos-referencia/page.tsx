@@ -2,7 +2,7 @@ import { exigirAdmin } from '@/lib/supabase/sessao'
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { TituloPagina, Cartao, Vazio, Moeda } from '@/components/ui'
 import { formatarData } from '@/lib/format'
-import { FormularioImportacao } from './formulario'
+import { FormularioImportacao, FormularioServicoProprio } from './formulario'
 import { limparBase } from './acoes'
 
 export default async function PaginaPrecosReferencia({
@@ -48,8 +48,8 @@ export default async function PaginaPrecosReferencia({
   return (
     <>
       <TituloPagina
-        titulo="Preços referenciais"
-        subtitulo="SINAPI, ORSE e SICRO — base para o orçamento executivo"
+        titulo="Preços de referência"
+        subtitulo="A tabela da RV e as tabelas públicas — base para o orçamento executivo"
       />
 
       <div className="grid gap-3 lg:grid-cols-[1fr_320px]">
@@ -140,9 +140,19 @@ export default async function PaginaPrecosReferencia({
           </Cartao>
         </div>
 
-        <Cartao titulo="Importar tabela">
-          <FormularioImportacao />
-        </Cartao>
+        <div className="space-y-3">
+          <Cartao titulo="Novo serviço da RV">
+            <p className="text-[12px] text-slate-600 mb-2">
+              O seu preço, do jeito que você cobra. Vai para a mesma busca do orçamento — digita
+              uma vez, usa em toda obra.
+            </p>
+            <FormularioServicoProprio />
+          </Cartao>
+
+          <Cartao titulo="Importar tabela">
+            <FormularioImportacao />
+          </Cartao>
+        </div>
       </div>
     </>
   )

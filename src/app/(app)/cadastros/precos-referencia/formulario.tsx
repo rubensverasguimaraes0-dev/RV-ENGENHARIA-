@@ -1,7 +1,7 @@
 'use client'
 
 import { FormularioAcao, Campo, Selecao } from '@/components/formulario'
-import { importarPrecos } from './acoes'
+import { importarPrecos, salvarServicoProprio } from './acoes'
 import { hojeISO } from '@/lib/format'
 
 export function FormularioImportacao() {
@@ -15,6 +15,7 @@ export function FormularioImportacao() {
           { valor: 'SINAPI', rotulo: 'SINAPI' },
           { valor: 'ORSE', rotulo: 'ORSE' },
           { valor: 'SICRO', rotulo: 'SICRO' },
+          { valor: 'proprio', rotulo: 'Tabela da RV — os seus preços' },
         ]}
       />
       <Selecao
@@ -45,6 +46,36 @@ export function FormularioImportacao() {
           acento e decimal com vírgula.
         </span>
       </label>
+    </FormularioAcao>
+  )
+}
+
+/**
+ * Um serviço da RV por vez, digitado na hora. É o caminho de quem está na obra
+ * e lembrou de um preço — sem planilha, sem CSV, sem baixar nada.
+ */
+export function FormularioServicoProprio() {
+  return (
+    <FormularioAcao
+      acao={salvarServicoProprio}
+      className="space-y-2"
+      rotuloBotao="Guardar serviço"
+    >
+      <Campo
+        rotulo="O serviço"
+        nome="descricao"
+        obrigatorio
+        dica="Como você diria ao cliente: “assentamento de piso cerâmico, com material”"
+      />
+      <div className="grid grid-cols-2 gap-2">
+        <Campo rotulo="Unidade" nome="unidade" obrigatorio dica="m², m, un, vb, diária" />
+        <Campo rotulo="Preço que a RV cobra" nome="preco_unitario" obrigatorio dica="Ex.: 78,50" />
+      </div>
+      <Campo
+        rotulo="Código (opcional)"
+        nome="codigo"
+        dica="Em branco, o app numera sozinho: RV-0001, RV-0002…"
+      />
     </FormularioAcao>
   )
 }

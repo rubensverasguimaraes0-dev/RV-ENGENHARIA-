@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { exigirAdmin } from '@/lib/supabase/sessao'
 import { coluna, lerCSV } from '@/lib/csv'
-import { lerData, lerMoeda } from '@/lib/format'
+import { hojeISO, lerData, lerMoeda } from '@/lib/format'
 import { textoObrigatorio, type EstadoForm } from '@/lib/form'
 
 /**
@@ -23,7 +23,7 @@ export async function importarPrecos(_e: EstadoForm | null, form: FormData): Pro
   const desonerado = String(form.get('desonerado') ?? 'nao') === 'sim'
   const arquivo = form.get('arquivo')
 
-  if (!base) return { erro: 'Selecione a base (SINAPI, ORSE ou SICRO).' }
+  if (!base) return { erro: 'Selecione a base.' }
   if (!(arquivo instanceof File) || arquivo.size === 0) return { erro: 'Escolha o arquivo CSV.' }
   if (arquivo.size > 8 * 1024 * 1024) return { erro: 'Arquivo acima de 8 MB.' }
 
@@ -108,4 +108,61 @@ export async function limparBase(form: FormData) {
     .eq('base', base)
     .is('excluido_em', null)
   revalidatePath('/cadastros/precos-referencia')
+}
+
+/**
+ * Guarda um servico da propria RV, com o preco que a RV cobra.
+ *
+ * As tabelas publicas dizem quanto custa em media; esta diz quanto a RV cobra.
+ * E a que mais se usa no dia a dia: sem ela, o mesmo "assentamento de piso
+ * ceramico, m2" seria redigitado a cada orcamento, com o risco de sair um
+ * preco diferente do anterior sem ninguem perceber.
+ *
+ * Mora na mesma tabela das referencias, com base 'proprio' — o orcamento ja
+ * sabe puxar dali, e o documento do cliente nao cita 'proprio' como tabela de
+ * referencia, porque nao e.
+ */
+export async function salvarServicoProprio(
+  _e: EstadoForm | null,
+  form: FormData,
+): Promise<EstadoForm> {
+  await exigirAdmin()
+  const supabase = await criarClienteServidor()
+
+  const descricao = textoObrigatorio(form.get('descricao'))
+  const unidade = textoObrigatorio(form.get('unidade'))
+  const preco = lerMoeda(String(form.get('preco_unitario') ?? ''))
+
+  if (!descricao) return { erro: 'Escreva o que é o serviço.' }
+  if (!unidade) return { erro: 'Informe a unidade (m², m, un, vb...).' }
+  if (preco === null || preco <= 0) return { erro: 'Informe o preço que a RV cobra.' }
+
+  // Codigo proprio, numerado em sequencia: RV-0001, RV-0002...
+  const { count } = await supabase
+    .from('precos_referencia')
+    .select('id', { count: 'exact', head: true })
+    .eq('base', 'proprio')
+
+  const codigoInformado = String(form.get('codigo') ?? '').trim()
+  const codigo = codigoInformado || `RV-${String((count ?? 0) + 1).padStart(4, '0')}`
+
+  const { error } = await supabase.from('precos_referencia').insert({
+    base: 'proprio',
+    codigo,
+    descricao,
+    unidade,
+    preco_unitario: preco,
+    data_base: hojeISO(),
+    uf: 'PI',
+    desonerado: false,
+  })
+
+  if (error) {
+    return error.code === '23505'
+      ? { erro: `Já existe um serviço com o código ${codigo} nesta data.` }
+      : { erro: error.message }
+  }
+
+  revalidatePath('/cadastros/precos-referencia')
+  return { ok: `Serviço guardado como ${codigo}.` }
 }
