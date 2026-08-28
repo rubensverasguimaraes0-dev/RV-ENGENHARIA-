@@ -14,9 +14,14 @@ insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'admin@rv.com'),
   ('22222222-2222-2222-2222-222222222222', 'encarregado@rv.com');
 
+-- Quando o banco e instalado pelo instalar.sql, o gatilho ao_criar_usuario ja
+-- criou estas linhas como lancador. O upsert deixa o teste rodar dos dois
+-- jeitos: com o gatilho ligado e sem ele.
 insert into public.usuarios (id, nome, email, perfil) values
   ('11111111-1111-1111-1111-111111111111', 'Rubens', 'admin@rv.com', 'admin'),
-  ('22222222-2222-2222-2222-222222222222', 'Encarregado', 'encarregado@rv.com', 'lancador');
+  ('22222222-2222-2222-2222-222222222222', 'Encarregado', 'encarregado@rv.com', 'lancador')
+on conflict (id) do update
+  set nome = excluded.nome, email = excluded.email, perfil = excluded.perfil;
 
 insert into public.clientes (id, nome) values
   ('33333333-3333-3333-3333-333333333333', 'Center Paes');

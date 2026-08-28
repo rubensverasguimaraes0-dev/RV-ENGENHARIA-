@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { criarClienteServidor } from '@/lib/supabase/server'
 import type { Centavos } from '@/lib/format'
 
@@ -44,6 +45,28 @@ export async function carregarParametros(): Promise<MapaParametros> {
   for (const p of data ?? []) mapa[p.chave as string] = p.valor as string
   return mapa
 }
+
+/**
+ * Identidade da empresa — nome, contato, logo e responsavel tecnico.
+ *
+ * Le a view `identidade_visivel` em vez da tabela `parametros`, porque
+ * `parametros` e so de administrador: guarda margem, BDI e meia diaria, que o
+ * lancador nao pode ver (regra 11.1). Sem isso a logo apareceria no topo do
+ * app para o administrador e sumiria para o lancador, no mesmo aplicativo.
+ *
+ * A view tambem e legivel pelo anonimo, para a tela de login se identificar
+ * antes de haver sessao.
+ *
+ * `cache` deduplica a leitura dentro da mesma requisicao: o layout e a pagina
+ * podem pedir a identidade a vontade, que o banco e consultado uma vez so.
+ */
+export const carregarIdentidade = cache(async (): Promise<MapaParametros> => {
+  const supabase = await criarClienteServidor()
+  const { data } = await supabase.from('identidade_visivel').select('chave, valor')
+  const mapa: MapaParametros = { ...PADROES }
+  for (const p of data ?? []) mapa[p.chave as string] = p.valor as string
+  return mapa
+})
 
 export function texto(p: MapaParametros, chave: string, padrao = ''): string {
   return p[chave] ?? PADROES[chave] ?? padrao

@@ -3,9 +3,13 @@ import { exigirUsuario } from '@/lib/supabase/sessao'
 import { sair } from '@/app/login/acoes'
 import { NavegacaoPrincipal } from '@/components/navegacao'
 import { ProvedorDeAvisos } from '@/components/avisos'
+import { Marca } from '@/components/marca'
+import { carregarIdentidade, texto } from '@/lib/parametros'
 
 export default async function LayoutApp({ children }: { children: React.ReactNode }) {
   const usuario = await exigirUsuario()
+  const identidade = await carregarIdentidade()
+  const nomeDaEmpresa = texto(identidade, 'empresa_nome')
 
   return (
     <ProvedorDeAvisos>
@@ -13,13 +17,8 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
       <header className="bg-rv-900 text-white nao-imprimir">
         <div className="mx-auto max-w-6xl px-3 h-14 flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-2.5 font-bold">
-            {/* Monograma do topo: fundo branco cheio contra o azul escuro da
-                barra, e o texto no azul mais fechado da paleta — e o par de
-                maior contraste que a identidade permite. */}
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-white text-rv-900 text-base font-black tracking-tight shadow-sm">
-              RV
-            </span>
-            <span className="hidden sm:inline text-[15px]">RV Engenharia</span>
+            <Marca logoUrl={texto(identidade, 'empresa_logo_url')} nome={nomeDaEmpresa} />
+            <span className="hidden sm:inline text-[15px]">{nomeDaEmpresa}</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
             <span className="hidden sm:inline text-rv-100">

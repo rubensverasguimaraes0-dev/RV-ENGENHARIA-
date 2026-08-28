@@ -1,4 +1,6 @@
 import { FormularioLogin } from './formulario'
+import { Marca } from '@/components/marca'
+import { carregarIdentidade, texto } from '@/lib/parametros'
 
 export const metadata = { title: 'Entrar — RV Engenharia' }
 
@@ -8,15 +10,19 @@ export default async function PaginaLogin({
   searchParams: Promise<{ proximo?: string }>
 }) {
   const { proximo } = await searchParams
+  const identidade = await carregarIdentidade()
+  const nomeDaEmpresa = texto(identidade, 'empresa_nome')
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4 bg-rv-900">
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
-          <div className="inline-flex h-16 w-16 items-center justify-center rounded-xl bg-white text-rv-800 text-2xl font-black">
-            RV
-          </div>
-          <h1 className="mt-3 text-xl font-bold text-white">RV Engenharia</h1>
+          <Marca
+            logoUrl={texto(identidade, 'empresa_logo_url')}
+            nome={nomeDaEmpresa}
+            tamanho="entrada"
+          />
+          <h1 className="mt-3 text-xl font-bold text-white">{nomeDaEmpresa}</h1>
           <p className="text-rv-100 text-sm">Gestão de obras, solar e locação</p>
         </div>
 
