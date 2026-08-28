@@ -34,8 +34,8 @@ Todos os catorze itens da ordem de construção da especificação estão entreg
 Fora desta versão, por decisão da própria especificação (item 14.10):
 levantamento de quantitativo a partir de projeto.
 
-Duas pendências de conteúdo, não de código, estão anotadas em
-[`PENDENCIAS.md`](PENDENCIAS.md).
+O que falta para o app entrar em uso não é código — é a publicação e o conteúdo das tabelas.
+Está tudo listado em [`PENDENCIAS.md`](PENDENCIAS.md).
 
 ## Como rodar
 
@@ -85,14 +85,21 @@ Os demais usuários podem ser criados pela própria tela de **Cadastros → Usu�
 ### Publicar
 
 Projeto pronto para a Vercel: importe o repositório, configure as três variáveis de ambiente e
-publique. No celular, use "Adicionar à tela de início" para instalar como aplicativo.
+publique. A branch `claude/new-session-qhl3bf` já é a branch principal do repositório, então não
+há nada a configurar em Production Branch. No celular, use "Adicionar à tela de início" para
+instalar como aplicativo.
+
+O passo a passo completo, com o instalador do banco pronto para copiar, está em
+[`documentos/guia-de-instalacao.html`](documentos/guia-de-instalacao.html) — abre em qualquer
+navegador, sem servidor.
 
 ---
 
 ## Testes
 
 ```bash
-npm test          # 214 testes das regras de negócio, do CSV e das planilhas geradas
+npm test          # 218 testes das regras de negócio, do CSV e das planilhas geradas
+npm run lint      # ESLint com as regras do Next.js
 npm run typecheck # TypeScript em modo estrito
 npm run build     # build de produção
 ```
@@ -136,7 +143,9 @@ src/
     format.ts              pt-BR: moeda, datas, semanas
 supabase/
   migrations/              esquema, RLS, seed, buckets e evoluções
+  instalar.sql             os sete migrations num arquivo só, dentro de uma transação
   tests/                   teste SQL de permissões
+documentos/                peças de comunicação — guia de instalação e carta ao parceiro
 ```
 
 ### Decisões que valem saber
