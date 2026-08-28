@@ -22,7 +22,7 @@ export function Marca({
   const naBarra = tamanho === 'barra'
   const caixa = naBarra
     ? 'h-9 rounded-md px-1.5 shadow-sm'
-    : 'h-16 rounded-xl px-2.5'
+    : 'rounded-xl px-3 py-2'
 
   if (logoUrl) {
     return (
@@ -31,7 +31,7 @@ export function Marca({
         <img
           src={logoUrl}
           alt={nome}
-          className={`w-auto object-contain ${naBarra ? 'max-h-7 max-w-[7.5rem]' : 'max-h-12 max-w-[11rem]'}`}
+          className={`w-auto object-contain ${naBarra ? 'max-h-7 max-w-[7.5rem]' : 'max-h-24 max-w-[13rem]'}`}
         />
       </span>
     )

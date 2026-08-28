@@ -4,7 +4,7 @@ import { sair } from '@/app/login/acoes'
 import { NavegacaoPrincipal } from '@/components/navegacao'
 import { ProvedorDeAvisos } from '@/components/avisos'
 import { Marca } from '@/components/marca'
-import { carregarIdentidade, texto } from '@/lib/parametros'
+import { carregarIdentidade, logoDaEmpresa, texto } from '@/lib/parametros'
 
 export default async function LayoutApp({ children }: { children: React.ReactNode }) {
   const usuario = await exigirUsuario()
@@ -17,7 +17,7 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
       <header className="bg-rv-900 text-white nao-imprimir">
         <div className="mx-auto max-w-6xl px-3 h-14 flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-2.5 font-bold">
-            <Marca logoUrl={texto(identidade, 'empresa_logo_url')} nome={nomeDaEmpresa} />
+            <Marca logoUrl={logoDaEmpresa(identidade, { compacta: true })} nome={nomeDaEmpresa} />
             <span className="hidden sm:inline text-[15px]">{nomeDaEmpresa}</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">

@@ -100,7 +100,7 @@ describe('medidas da logo na faixa do cabecalho', () => {
   })
 })
 
-describe('buscarLogo — nunca derruba a geracao da planilha', () => {
+describe('buscarLogo — o documento nunca sai sem marca', () => {
   afterEach(() => { vi.unstubAllGlobals() })
 
   const responder = (corpo: Uint8Array, init: { ok?: boolean; tamanho?: string } = {}) =>
@@ -110,45 +110,49 @@ describe('buscarLogo — nunca derruba a geracao da planilha', () => {
       arrayBuffer: async () => corpo.buffer.slice(corpo.byteOffset, corpo.byteOffset + corpo.byteLength),
     }))
 
-  it('devolve null quando nao ha logo configurada, sem nem tentar buscar', async () => {
+  /** A logo de verdade que acompanha o app, em public/logo-rv.png. */
+  const ehALogoDoApp = (logo: LogoPlanilha | null) =>
+    logo !== null && logo.formato === 'png' && logo.largura === 490 && logo.altura === 330
+
+  it('sem nada configurado, usa a logo que veio com o app — sem tocar na rede', async () => {
     const buscar = responder(pngFalso(10, 10))
     vi.stubGlobal('fetch', buscar)
-    expect(await buscarLogo('')).toBeNull()
-    expect(await buscarLogo('   ')).toBeNull()
+
+    expect(ehALogoDoApp(await buscarLogo(''))).toBe(true)
+    expect(ehALogoDoApp(await buscarLogo('   '))).toBe(true)
+    expect(ehALogoDoApp(await buscarLogo('/logo-rv.png'))).toBe(true)
     expect(buscar).not.toHaveBeenCalled()
   })
 
-  it('recusa endereco invalido e fora do https', async () => {
+  it('endereco invalido ou fora do https tambem cai na logo do app, sem tocar na rede', async () => {
     const buscar = responder(pngFalso(10, 10))
     vi.stubGlobal('fetch', buscar)
-    expect(await buscarLogo('isto nao e uma url')).toBeNull()
-    expect(await buscarLogo('http://exemplo.com/logo.png')).toBeNull()
-    expect(await buscarLogo('file:///etc/passwd')).toBeNull()
+
+    expect(ehALogoDoApp(await buscarLogo('isto nao e uma url'))).toBe(true)
+    expect(ehALogoDoApp(await buscarLogo('http://exemplo.com/logo.png'))).toBe(true)
+    expect(ehALogoDoApp(await buscarLogo('file:///etc/passwd'))).toBe(true)
     expect(buscar).not.toHaveBeenCalled()
   })
 
-  it('traz a logo quando o servidor responde uma imagem', async () => {
+  it('a logo configurada manda, quando o servidor responde uma imagem', async () => {
     vi.stubGlobal('fetch', responder(pngFalso(240, 80)))
     const logo = await buscarLogo('https://projeto.supabase.co/storage/v1/object/publico/logo.png')
-    expect(logo).not.toBeNull()
     expect(logo?.formato).toBe('png')
     expect(logo?.largura).toBe(240)
     expect(logo?.altura).toBe(80)
   })
 
-  it('devolve null quando o servidor erra, quando o arquivo e grande demais e quando a rede cai', async () => {
+  it('servidor com erro, arquivo grande demais, rede fora ou resposta que nao e imagem: volta para a do app', async () => {
     vi.stubGlobal('fetch', responder(pngFalso(10, 10), { ok: false }))
-    expect(await buscarLogo('https://exemplo.com/logo.png')).toBeNull()
+    expect(ehALogoDoApp(await buscarLogo('https://exemplo.com/logo.png'))).toBe(true)
 
     vi.stubGlobal('fetch', responder(pngFalso(10, 10), { tamanho: String(50 * 1024 * 1024) }))
-    expect(await buscarLogo('https://exemplo.com/logo.png')).toBeNull()
+    expect(ehALogoDoApp(await buscarLogo('https://exemplo.com/logo.png'))).toBe(true)
 
     vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('rede fora') }))
-    expect(await buscarLogo('https://exemplo.com/logo.png')).toBeNull()
-  })
+    expect(ehALogoDoApp(await buscarLogo('https://exemplo.com/logo.png'))).toBe(true)
 
-  it('devolve null quando o que volta nao e imagem', async () => {
     vi.stubGlobal('fetch', responder(new TextEncoder().encode('<html>erro 404</html>')))
-    expect(await buscarLogo('https://exemplo.com/logo.png')).toBeNull()
+    expect(ehALogoDoApp(await buscarLogo('https://exemplo.com/logo.png'))).toBe(true)
   })
 })

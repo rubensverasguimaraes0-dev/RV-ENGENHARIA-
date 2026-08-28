@@ -59,5 +59,10 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|icons/|manifest.webmanifest|sw.js).*)'],
+  // A logo entra na tela de login, que e vista sem sessao: se o middleware
+  // rodar sobre ela, o proprio arquivo e redirecionado para /login e a imagem
+  // quebra justamente na tela onde ela mais aparece.
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|icons/|logo-rv|manifest.webmanifest|sw.js).*)',
+  ],
 }

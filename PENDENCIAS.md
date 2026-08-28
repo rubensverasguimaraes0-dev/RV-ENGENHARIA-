@@ -1,7 +1,7 @@
 # Pendências
 
 Os catorze itens da ordem de construção da especificação estão entregues, e o código está
-verificado: lint limpo, TypeScript sem erro, 248 testes passando, build compilando as 50 rotas e
+verificado: lint limpo, TypeScript sem erro, 246 testes passando, build compilando as 50 rotas e
 `npm audit --omit=dev` sem vulnerabilidade. Os dois testes SQL rodam contra um Postgres de
 verdade, sobre um banco instalado pelo `instalar.sql`.
 
@@ -32,21 +32,19 @@ comercial. Para uso da empresa o plano correto é o Pro.
 
 ---
 
-## 2. Material seu
+## 2. Material — a logo já entrou; faltam as tabelas
 
-**A logo da RV.** O app inteiro já está ligado nela — falta só o arquivo. Suba a imagem no bucket
-`publico` do Supabase e cole a URL no parâmetro `empresa_logo_url`, em Cadastros → Parâmetros.
-A partir daí ela aparece sozinha, sem mexer em código nenhum, em:
+**A logo da RV — feito.** O arquivo que você mandou já está no app, em `public/logo-rv.png` (a
+logo completa) e `public/logo-rv-marca.png` (só o monograma, para os espaços pequenos). Ela
+aparece sozinha, sem configurar nada:
 
-- o topo do aplicativo e a tela de login, para todos os perfis;
-- os nove documentos A4 que vão ao cliente;
-- as quatro planilhas xlsx, embutida no arquivo.
+- no topo do aplicativo, o monograma — a palavra "engenharia" viraria um borrão com 36 pixels;
+- na tela de login, os documentos A4 e as planilhas xlsx, a logo completa;
+- nos ícones da tela de início do celular, nos três tamanhos, com o recorte redondo respeitado.
 
-Enquanto o parâmetro estiver vazio, tudo isso cai no monograma "RV" — e se a URL estiver errada ou
-o bucket fora do ar, os documentos saem do mesmo jeito, sem a imagem.
-
-Uma coisa continua precisando do arquivo em mãos: os **ícones do PWA** (`public/icons/`), que são o
-que aparece na tela de início do celular. Me mande a logo que eu gero os três tamanhos.
+Para trocar depois, é só preencher `empresa_logo_url` em Cadastros → Parâmetros: o que estiver lá
+passa a mandar em todo lugar. Se esse endereço um dia falhar, o app volta para a logo que veio
+com ele em vez de gerar documento sem marca.
 
 **As tabelas de preço.** Três bases entram por CSV e ainda estão vazias:
 

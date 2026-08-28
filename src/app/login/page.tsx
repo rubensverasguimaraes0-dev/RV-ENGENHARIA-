@@ -1,6 +1,6 @@
 import { FormularioLogin } from './formulario'
 import { Marca } from '@/components/marca'
-import { carregarIdentidade, texto } from '@/lib/parametros'
+import { carregarIdentidade, logoDaEmpresa, texto } from '@/lib/parametros'
 
 export const metadata = { title: 'Entrar — RV Engenharia' }
 
@@ -18,7 +18,7 @@ export default async function PaginaLogin({
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
           <Marca
-            logoUrl={texto(identidade, 'empresa_logo_url')}
+            logoUrl={logoDaEmpresa(identidade)}
             nome={nomeDaEmpresa}
             tamanho="entrada"
           />

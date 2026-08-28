@@ -234,25 +234,27 @@ describe('a logo da empresa no topo da planilha (regra 11.3)', () => {
   it('recua o título para ele não ficar por baixo da logo', async () => {
     servirLogo(pngFalso(240, 80))
     const comLogo = await gerar(URL_LOGO)
-    const semLogo = await gerar('')
 
     const recuo = (wb: ExcelJS.Workbook) =>
       wb.worksheets[0]!.getCell('A1').alignment?.indent ?? 0
 
     expect(recuo(comLogo)).toBeGreaterThan(0)
-    expect(recuo(semLogo)).toBe(0)
+    // uma logo mais larga empurra o título mais para a direita
+    servirLogo(pngFalso(600, 80))
+    expect(recuo(await gerar(URL_LOGO))).toBeGreaterThan(recuo(comLogo))
   })
 
-  it('sem logo configurada a planilha sai como sempre saiu', async () => {
+  it('sem logo configurada, sai a logo que veio com o app', async () => {
     const wb = await gerar('')
-    expect(wb.model.media ?? []).toHaveLength(0)
+    expect(wb.model.media).toHaveLength(1)
+    expect(wb.worksheets[0]!.getImages()).toHaveLength(1)
     expect(wb.worksheets[0]!.getCell('A1').value).toContain('RV Engenharia')
   })
 
-  it('se a logo não carregar, a planilha sai mesmo assim', async () => {
+  it('se a logo configurada não carregar, cai na do app em vez de sair sem marca', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('bucket fora do ar') }))
     const wb = await gerar(URL_LOGO)
-    expect(wb.model.media ?? []).toHaveLength(0)
+    expect(wb.model.media).toHaveLength(1)
     expect(wb.worksheets[0]!.getCell('A1').value).toContain('RV Engenharia')
   })
 })

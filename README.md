@@ -99,7 +99,7 @@ navegador, sem servidor.
 ## Testes
 
 ```bash
-npm test          # 248 testes das regras de negócio, do CSV e das planilhas geradas
+npm test          # 246 testes das regras de negócio, do CSV e das planilhas geradas
 npm run lint      # ESLint com as regras do Next.js
 npm run typecheck # TypeScript em modo estrito
 npm run build     # build de produção

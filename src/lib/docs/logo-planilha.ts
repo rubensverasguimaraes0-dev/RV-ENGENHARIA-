@@ -73,13 +73,28 @@ export function medirImagem(bytes: Uint8Array): Omit<LogoPlanilha, 'dados' | 'id
 }
 
 /**
- * Baixa a logo. Devolve null em qualquer tropeco — URL vazia, fora do https,
- * arquivo grande demais, formato que o Excel nao embute, servidor fora do ar.
+ * Le a logo que acompanha o app, de `public/`. E o caminho usado enquanto
+ * ninguem tiver configurado uma logo propria — o xlsx nao pode buscar um
+ * endereco relativo pela rede, entao vai direto ao arquivo.
+ *
+ * O next.config declara este arquivo em outputFileTracingIncludes, para ele
+ * viajar junto com a funcao de servidor na Vercel.
  */
-export async function buscarLogo(url: string): Promise<LogoPlanilha | null> {
-  const endereco = url.trim()
-  if (!endereco) return null
+async function lerLogoEmbutida(): Promise<LogoPlanilha | null> {
+  try {
+    const { readFile } = await import('node:fs/promises')
+    const { join } = await import('node:path')
+    const bytes = new Uint8Array(await readFile(join(process.cwd(), 'public', 'logo-rv.png')))
+    const medida = medirImagem(bytes)
+    if (!medida) return null
+    return { ...medida, dados: Buffer.from(bytes) }
+  } catch {
+    return null
+  }
+}
 
+/** Baixa a logo de um endereco https. Null em qualquer tropeco. */
+async function baixarLogo(endereco: string): Promise<LogoPlanilha | null> {
   let alvo: URL
   try {
     alvo = new URL(endereco)
@@ -109,6 +124,20 @@ export async function buscarLogo(url: string): Promise<LogoPlanilha | null> {
   } catch {
     return null
   }
+}
+
+/**
+ * Traz a logo para o cabecalho da planilha.
+ *
+ * Endereco vazio ou relativo e a logo que veio com o app. Um endereco https
+ * que nao responda, ou que devolva algo que nao e imagem, tambem cai nela:
+ * um documento de cliente com a marca certa vale mais do que um documento
+ * sem marca nenhuma. Nada aqui derruba a geracao da planilha.
+ */
+export async function buscarLogo(url: string): Promise<LogoPlanilha | null> {
+  const endereco = url.trim()
+  if (!endereco || endereco.startsWith('/')) return lerLogoEmbutida()
+  return (await baixarLogo(endereco)) ?? lerLogoEmbutida()
 }
 
 /** Altura da logo na faixa do cabecalho, em pixels. */

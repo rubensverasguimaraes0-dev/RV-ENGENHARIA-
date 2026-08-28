@@ -68,6 +68,29 @@ export const carregarIdentidade = cache(async (): Promise<MapaParametros> => {
   return mapa
 })
 
+/**
+ * As logos que acompanham o app, servidas de `public/`. Sao o padrao: o
+ * aplicativo ja nasce com a marca da RV, sem ninguem precisar configurar nada.
+ *
+ * Duas versoes porque uma so nao serve aos dois tamanhos: na barra do topo,
+ * com 36 pixels de altura, a palavra "engenharia" da logo completa viraria um
+ * borrao. La entra so o monograma.
+ */
+export const LOGO_EMBUTIDA = '/logo-rv.png'
+export const LOGO_EMBUTIDA_MARCA = '/logo-rv-marca.png'
+
+/**
+ * Endereco da logo a usar. O parametro `empresa_logo_url` manda quando estiver
+ * preenchido — e assim que a logo se troca sem mexer em codigo, e ai o mesmo
+ * arquivo vale para todo tamanho, porque nao da para recortar o arquivo de
+ * outra pessoa. Vazio, cai na que veio junto com o app.
+ */
+export function logoDaEmpresa(p: MapaParametros, opcoes?: { compacta?: boolean }): string {
+  const configurada = texto(p, 'empresa_logo_url').trim()
+  if (configurada) return configurada
+  return opcoes?.compacta ? LOGO_EMBUTIDA_MARCA : LOGO_EMBUTIDA
+}
+
 export function texto(p: MapaParametros, chave: string, padrao = ''): string {
   return p[chave] ?? PADROES[chave] ?? padrao
 }
@@ -110,7 +133,7 @@ export function dadosEmpresa(p: MapaParametros): DadosEmpresa {
     telefone: texto(p, 'empresa_telefone'),
     email: texto(p, 'empresa_email'),
     instagram: texto(p, 'empresa_instagram'),
-    logo_url: texto(p, 'empresa_logo_url'),
+    logo_url: logoDaEmpresa(p),
     responsavel: texto(p, 'responsavel_nome'),
     responsavel_titulo: texto(p, 'responsavel_titulo'),
     crea: texto(p, 'responsavel_crea'),
