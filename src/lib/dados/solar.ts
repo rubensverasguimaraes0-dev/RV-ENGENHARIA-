@@ -10,7 +10,7 @@ import {
   type PrecoDeItem,
 } from '@/lib/domain/proposta-solar'
 import { carregarParametros, centavos, numero } from '@/lib/parametros'
-import type { Centavos, DataISO } from '@/lib/format'
+import type { Centavos } from '@/lib/format'
 
 export interface ProjetoSolar {
   id: string

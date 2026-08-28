@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FormularioAcao, Campo, Selecao, AreaTexto, Marcador } from '@/components/formulario'
+import { FormularioAcao, Campo, Selecao, AreaTexto } from '@/components/formulario'
 import { criarContrato, importarTabelaPrecos, registrarDevolucao, salvarEquipamento } from './acoes'
 import { formatarMoeda, formatarValor, hojeISO, somarDias } from '@/lib/format'
 import type { EquipamentoRow, ContratoRow } from '@/lib/dados/locacao'

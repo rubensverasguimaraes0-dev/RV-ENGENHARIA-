@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FormularioAcao, Campo, Selecao, Marcador } from '@/components/formulario'
+import { FormularioAcao, Campo, Selecao } from '@/components/formulario'
 import { CapturaFoto } from '@/components/captura-foto'
 import { salvarArquivo } from './acoes'
 import { hojeISO } from '@/lib/format'
