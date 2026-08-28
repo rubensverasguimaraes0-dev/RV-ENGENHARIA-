@@ -99,7 +99,7 @@ navegador, sem servidor.
 ## Testes
 
 ```bash
-npm test          # 218 testes das regras de negócio, do CSV e das planilhas geradas
+npm test          # 248 testes das regras de negócio, do CSV e das planilhas geradas
 npm run lint      # ESLint com as regras do Next.js
 npm run typecheck # TypeScript em modo estrito
 npm run build     # build de produção
@@ -118,7 +118,12 @@ contrato, custo, orçamento nem resultado:
 
 ```bash
 psql -v ON_ERROR_STOP=1 -f supabase/tests/rls_test.sql
+psql -v ON_ERROR_STOP=1 -f supabase/tests/identidade_test.sql
 ```
+
+O segundo prova as duas metades da regra da identidade: o lançador **precisa** ler nome, logo e
+CREA para o app e os documentos saírem com a cara da empresa, e **não pode** ler margem, BDI nem
+meia diária. Os dois rodam sobre um banco criado pelo `supabase/instalar.sql`.
 
 ---
 

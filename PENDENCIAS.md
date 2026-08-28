@@ -1,8 +1,9 @@
 # Pendências
 
 Os catorze itens da ordem de construção da especificação estão entregues, e o código está
-verificado: lint limpo, TypeScript sem erro, 218 testes passando, build compilando as 50 rotas e
-`npm audit --omit=dev` sem vulnerabilidade.
+verificado: lint limpo, TypeScript sem erro, 248 testes passando, build compilando as 50 rotas e
+`npm audit --omit=dev` sem vulnerabilidade. Os dois testes SQL rodam contra um Postgres de
+verdade, sobre um banco instalado pelo `instalar.sql`.
 
 O que falta não é código. É publicação, conteúdo e duas decisões.
 
