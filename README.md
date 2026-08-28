@@ -35,7 +35,8 @@ Fora desta versão, por decisão da própria especificação (item 14.10):
 levantamento de quantitativo a partir de projeto.
 
 O que falta para o app entrar em uso não é código — é a publicação e o conteúdo das tabelas.
-Está tudo listado em [`PENDENCIAS.md`](PENDENCIAS.md).
+Está tudo listado em [`PENDENCIAS.md`](PENDENCIAS.md), e reunido de forma visual em
+[`documentos/painel.html`](documentos/painel.html).
 
 ## Como rodar
 

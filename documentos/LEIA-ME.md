@@ -35,3 +35,11 @@ Guia de instalacao em tres fases (Supabase, Vercel, celular), com o
 qualquer navegador, sem precisar de servidor.
 
 Publicado em https://claude.ai/code/artifact/f84d35b4-76db-4505-99a3-70ad94da1a22
+
+## `painel.html`
+
+Painel de estado do projeto: o placar da verificacao, os tres passos que
+faltam para por o app no ar (com marcacao que fica guardada no proprio
+navegador) e todos os links reunidos.
+
+Publicado em https://claude.ai/code/artifact/d70abaca-5e21-4c0f-a134-2a9587c1e1c5

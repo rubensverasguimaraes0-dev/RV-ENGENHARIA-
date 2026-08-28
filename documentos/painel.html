@@ -1,0 +1,463 @@
+<title>Painel da RV Engenharia</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&display=swap">
+
+<style>
+:root{
+  --papel:#ffffff;
+  --fundo:#edf1f5;
+  --painel:#f7fafc;
+  --ferro:#0e1c27;
+  --meio:#3d5163;
+  --fraco:#66798a;
+  --linha:#d5dee6;
+  --linha-fina:#e5ecf2;
+  --navy:#073457;
+  --azul:#0b4f8a;
+  --azul-claro:#e4eefa;
+  --sol:#a5620d;
+  --sol-claro:#fdf3e4;
+  --verde:#14653b;
+  --verde-claro:#ddf4e7;
+  --sombra:0 1px 2px rgba(7,52,87,.05), 0 10px 28px rgba(7,52,87,.07);
+  --sans:'IBM Plex Sans',ui-sans-serif,system-ui,'Segoe UI',Roboto,Arial,sans-serif;
+  --serif:'IBM Plex Serif',Georgia,'Times New Roman',serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --papel:#132131; --fundo:#0b131c; --painel:#182838;
+    --ferro:#e8eff6; --meio:#b3c6d6; --fraco:#8399ad;
+    --linha:#27394c; --linha-fina:#1d2c3c;
+    --navy:#9dcbef; --azul:#5ea9df; --azul-claro:#15334c;
+    --sol:#e6b063; --sol-claro:#342710;
+    --verde:#6fd6a0; --verde-claro:#0f3222;
+    --sombra:0 1px 2px rgba(0,0,0,.32), 0 10px 28px rgba(0,0,0,.3);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --papel:#132131; --fundo:#0b131c; --painel:#182838;
+  --ferro:#e8eff6; --meio:#b3c6d6; --fraco:#8399ad;
+  --linha:#27394c; --linha-fina:#1d2c3c;
+  --navy:#9dcbef; --azul:#5ea9df; --azul-claro:#15334c;
+  --sol:#e6b063; --sol-claro:#342710;
+  --verde:#6fd6a0; --verde-claro:#0f3222;
+  --sombra:0 1px 2px rgba(0,0,0,.32), 0 10px 28px rgba(0,0,0,.3);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--fundo); color:var(--ferro);
+  font-family:var(--sans); font-size:16px; line-height:1.6;
+  -webkit-text-size-adjust:100%;
+}
+.env{max-width:52rem;margin:0 auto;padding:0 1.1rem 5rem}
+h1,h2,h3{font-family:var(--serif);text-wrap:balance;line-height:1.2;margin:0}
+p{margin:0}
+a{color:var(--azul)}
+
+/* ---------------- cabeçalho ---------------- */
+header.topo{
+  display:flex;gap:.9rem;align-items:center;
+  padding:2.4rem 0 1.1rem;border-bottom:3px solid var(--navy);margin-bottom:1.5rem;
+}
+.selo{
+  width:3.2rem;height:3.2rem;border-radius:.6rem;flex-shrink:0;
+  background:var(--navy);color:var(--papel);display:grid;place-items:center;
+  font-weight:800;font-size:1.2rem;letter-spacing:-.03em;
+}
+.etiqueta{
+  font-family:var(--mono);font-size:.7rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--fraco);margin-bottom:.15rem;
+}
+header.topo h1{font-size:clamp(1.4rem,5vw,1.85rem);font-weight:700;letter-spacing:-.02em}
+.chamada{
+  font-size:1.02rem;color:var(--meio);margin-bottom:1.6rem;max-width:56ch;
+}
+.chamada b{color:var(--ferro);font-weight:600}
+
+/* ---------------- placar ---------------- */
+.placar{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(8.2rem,1fr));
+  gap:.6rem;margin-bottom:2rem;
+}
+.ficha{
+  background:var(--papel);border:1px solid var(--linha);border-radius:.55rem;
+  padding:.7rem .8rem;box-shadow:var(--sombra);
+}
+.ficha .num{
+  font-family:var(--mono);font-size:1.35rem;font-weight:600;
+  color:var(--verde);line-height:1.1;font-variant-numeric:tabular-nums;
+}
+.ficha .rot{font-size:.76rem;color:var(--fraco);margin-top:.15rem;line-height:1.35}
+
+/* ---------------- seções ---------------- */
+section{margin-bottom:2.2rem}
+.faixa{
+  display:flex;align-items:baseline;gap:.7rem;flex-wrap:wrap;
+  padding-bottom:.45rem;border-bottom:1px solid var(--linha);margin-bottom:1rem;
+}
+.faixa h2{font-size:1.18rem;color:var(--navy)}
+.faixa .lado{
+  margin-left:auto;font-family:var(--mono);font-size:.72rem;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--fraco);
+}
+
+/* ---------------- os três passos ---------------- */
+.barra{
+  height:.4rem;border-radius:.2rem;background:var(--linha-fina);
+  overflow:hidden;margin-bottom:1rem;border:1px solid var(--linha);
+}
+.barra i{display:block;height:100%;background:var(--verde);width:0;transition:width .3s}
+@media (prefers-reduced-motion:reduce){.barra i{transition:none}}
+
+.passo{
+  display:flex;gap:.85rem;align-items:flex-start;
+  background:var(--papel);border:1px solid var(--linha);border-left:4px solid var(--sol);
+  border-radius:.55rem;padding:.9rem 1rem;margin-bottom:.7rem;box-shadow:var(--sombra);
+}
+.passo.feito{border-left-color:var(--verde);background:var(--painel)}
+.passo.feito .titulo{text-decoration:line-through;color:var(--fraco)}
+.passo input[type="checkbox"]{
+  width:1.35rem;height:1.35rem;margin:.15rem 0 0;flex-shrink:0;
+  accent-color:var(--verde);cursor:pointer;
+}
+.passo .corpo{min-width:0;flex:1}
+.passo .cab{display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap}
+.passo .ordem{
+  font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--papel);
+  background:var(--navy);border-radius:.25rem;padding:.08rem .4rem;flex-shrink:0;
+}
+.passo.feito .ordem{background:var(--verde)}
+.titulo{font-family:var(--serif);font-size:1.02rem;font-weight:600}
+.passo .tempo{
+  margin-left:auto;font-family:var(--mono);font-size:.72rem;color:var(--fraco);flex-shrink:0;
+}
+.passo .desc{font-size:.93rem;color:var(--meio);margin-top:.3rem}
+.passo .desc code{
+  font-family:var(--mono);font-size:.85em;background:var(--azul-claro);
+  color:var(--navy);padding:.08em .34em;border-radius:.22rem;
+}
+.passo .ir{
+  display:inline-block;margin-top:.55rem;font-size:.86rem;font-weight:600;
+  font-family:var(--mono);text-decoration:none;color:var(--azul);
+  border:1px solid var(--linha);border-radius:.35rem;padding:.3rem .7rem;background:var(--painel);
+}
+.passo .ir:hover{background:var(--azul-claro)}
+.passo .ir:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+
+.remate{
+  background:var(--verde-claro);border-left:4px solid var(--verde);
+  border-radius:0 .45rem .45rem 0;padding:.75rem .95rem;font-size:.94rem;color:var(--ferro);
+}
+.remate b{font-weight:600}
+
+/* ---------------- links ---------------- */
+.cartoes{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.7rem}
+a.cartao{
+  display:block;text-decoration:none;color:inherit;
+  background:var(--papel);border:1px solid var(--linha);border-radius:.55rem;
+  padding:.85rem .95rem;box-shadow:var(--sombra);
+}
+a.cartao:hover{border-color:var(--azul)}
+a.cartao:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+a.cartao .qual{
+  font-family:var(--mono);font-size:.68rem;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--fraco);
+}
+a.cartao .nome{font-family:var(--serif);font-size:1rem;font-weight:600;color:var(--navy);margin-top:.15rem}
+a.cartao .oque{font-size:.87rem;color:var(--meio);margin-top:.25rem}
+
+/* ---------------- listas de pendência ---------------- */
+.itens{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.6rem}
+.itens li{
+  background:var(--papel);border:1px solid var(--linha);border-radius:.5rem;
+  padding:.75rem .9rem;display:flex;gap:.7rem;align-items:flex-start;
+}
+.selo-cat{
+  font-family:var(--mono);font-size:.65rem;font-weight:600;text-transform:uppercase;
+  letter-spacing:.07em;border-radius:.25rem;padding:.15rem .45rem;flex-shrink:0;margin-top:.15rem;
+  background:var(--sol-claro);color:var(--sol);
+}
+.selo-cat.espera{background:var(--azul-claro);color:var(--azul)}
+.itens .oque{font-weight:600;font-size:.95rem}
+.itens .por{font-size:.88rem;color:var(--meio);margin-top:.15rem}
+
+/* ---------------- feito enquanto fora ---------------- */
+.diario{list-style:none;margin:0;padding:0;border-left:2px solid var(--linha);padding-left:1rem}
+.diario li{margin-bottom:.8rem;position:relative}
+.diario li::before{
+  content:'';position:absolute;left:-1.32rem;top:.55rem;
+  width:.5rem;height:.5rem;border-radius:50%;background:var(--verde);
+  box-shadow:0 0 0 3px var(--fundo);
+}
+.diario .q{font-weight:600;font-size:.95rem}
+.diario .d{font-size:.88rem;color:var(--meio);margin-top:.1rem}
+
+.rodape{
+  margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--linha);
+  font-size:.83rem;color:var(--fraco);
+}
+.rodape .nome{font-family:var(--serif);font-weight:600;color:var(--navy);font-size:.95rem}
+</style>
+
+<div class="env">
+
+  <header class="topo">
+    <div class="selo">RV</div>
+    <div>
+      <p class="etiqueta">RV Engenharia — Teresina/PI</p>
+      <h1>Painel do aplicativo</h1>
+    </div>
+  </header>
+
+  <p class="chamada">
+    Enquanto você estava no evento, deixei o projeto <b>verificado, arrumado e enviado</b>.
+    O código está pronto e conferido. O que falta é uma coisa só, e depende de contas no seu nome:
+    <b>pôr o app no ar</b>. São três passos, uns vinte minutos.
+  </p>
+
+  <div class="placar">
+    <div class="ficha"><div class="num">218</div><div class="rot">testes passando, em 15 arquivos</div></div>
+    <div class="ficha"><div class="num">50</div><div class="rot">rotas compilando no build</div></div>
+    <div class="ficha"><div class="num">30</div><div class="rot">casos de teste da especificação, todos cobertos</div></div>
+    <div class="ficha"><div class="num">0</div><div class="rot">erros de lint, de tipo e de segurança</div></div>
+  </div>
+
+  <!-- ============ OS TRÊS PASSOS ============ -->
+  <section>
+    <div class="faixa">
+      <h2>Falta só pôr no ar</h2>
+      <span class="lado" id="contador">0 de 3</span>
+    </div>
+    <div class="barra"><i id="progresso"></i></div>
+
+    <div class="passo" data-id="p1">
+      <input type="checkbox" aria-label="Concluir: criar o banco no Supabase">
+      <div class="corpo">
+        <div class="cab">
+          <span class="ordem">1</span>
+          <span class="titulo">Criar o banco no Supabase</span>
+          <span class="tempo">~8 min</span>
+        </div>
+        <p class="desc">
+          Conta nova, <b>New project</b>, região <b>South America (São Paulo)</b>. Depois
+          <b>SQL Editor → New query</b>, colar o instalador e clicar em <b>Run</b>. Ele cria as
+          36 tabelas, as 24 políticas de permissão, os 38 parâmetros e os 5 buckets — tudo dentro
+          de uma transação, então roda inteiro ou não roda nada.
+        </p>
+        <a class="ir" href="https://supabase.com/dashboard/projects" target="_blank" rel="noreferrer">abrir o Supabase →</a>
+      </div>
+    </div>
+
+    <div class="passo" data-id="p2">
+      <input type="checkbox" aria-label="Concluir: criar seu usuário e copiar as chaves">
+      <div class="corpo">
+        <div class="cab">
+          <span class="ordem">2</span>
+          <span class="titulo">Virar administrador e pegar as chaves</span>
+          <span class="tempo">~5 min</span>
+        </div>
+        <p class="desc">
+          <b>Authentication → Users → Add user</b>, com <b>Auto Confirm User</b> marcado. Todo
+          usuário nasce como lançador, então rode no SQL Editor
+          <code>update public.usuarios set perfil = 'admin' where email = 'seu@email.com';</code>
+          Depois copie as três chaves em <b>Project Settings → API</b>.
+        </p>
+        <a class="ir" href="https://claude.ai/code/artifact/f84d35b4-76db-4505-99a3-70ad94da1a22" target="_blank" rel="noreferrer">ver o passo a passo →</a>
+      </div>
+    </div>
+
+    <div class="passo" data-id="p3">
+      <input type="checkbox" aria-label="Concluir: publicar na Vercel">
+      <div class="corpo">
+        <div class="cab">
+          <span class="ordem">3</span>
+          <span class="titulo">Publicar na Vercel</span>
+          <span class="tempo">~7 min</span>
+        </div>
+        <p class="desc">
+          Entre com a mesma conta do GitHub, importe <code>RV-ENGENHARIA-</code>, cole as três
+          chaves em <b>Environment Variables</b> e clique em <b>Deploy</b>. Não mexa em nada de
+          build — a Vercel reconhece o Next.js sozinha, e a branch principal já está resolvida.
+        </p>
+        <a class="ir" href="https://vercel.com/new" target="_blank" rel="noreferrer">abrir a Vercel →</a>
+      </div>
+    </div>
+
+    <p class="remate">
+      No fim do passo 3 sai um endereço parecido com <b>rv-engenharia.vercel.app</b>.
+      <b>Esse é o link do aplicativo.</b> Abra no celular e use “Adicionar à tela de início” —
+      ele passa a abrir como app, com ícone próprio e sem barra de navegador.
+    </p>
+  </section>
+
+  <!-- ============ LINKS ============ -->
+  <section>
+    <div class="faixa">
+      <h2>Seus links</h2>
+      <span class="lado">guarde estes quatro</span>
+    </div>
+    <div class="cartoes">
+      <a class="cartao" href="https://claude.ai/code/artifact/f84d35b4-76db-4505-99a3-70ad94da1a22" target="_blank" rel="noreferrer">
+        <div class="qual">Passo a passo</div>
+        <div class="nome">Guia de instalação</div>
+        <div class="oque">As três fases em detalhe, com o instalador do banco atrás de um botão de copiar.</div>
+      </a>
+      <a class="cartao" href="https://claude.ai/code/artifact/49bd41cc-58b2-4532-a6a1-205a9d241185" target="_blank" rel="noreferrer">
+        <div class="qual">Como ficou</div>
+        <div class="nome">Prévia das telas</div>
+        <div class="oque">As telas principais, com o botão Antes/Depois da melhoria de interface.</div>
+      </a>
+      <a class="cartao" href="https://claude.ai/code/artifact/84ba33b8-425d-4341-9f4b-16c367277811" target="_blank" rel="noreferrer">
+        <div class="qual">Para o Bernardo</div>
+        <div class="nome">Página de envio do código</div>
+        <div class="oque">Onde ele cola o módulo solar dele. Já endereçada com o nome dele.</div>
+      </a>
+      <a class="cartao" href="https://github.com/rubensverasguimaraes0-dev/RV-ENGENHARIA-" target="_blank" rel="noreferrer">
+        <div class="qual">Código</div>
+        <div class="nome">Repositório no GitHub</div>
+        <div class="oque">Tudo enviado. A carta em PDF para o Bernardo está na pasta <code>documentos/</code>.</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ PENDÊNCIAS ============ -->
+  <section>
+    <div class="faixa">
+      <h2>O que ainda depende de alguém</h2>
+      <span class="lado">nada disso trava o app</span>
+    </div>
+    <ul class="itens">
+      <li>
+        <span class="selo-cat">você</span>
+        <div>
+          <div class="oque">A logo da RV</div>
+          <div class="por">Hoje os documentos usam um monograma provisório. Suba o arquivo no bucket
+          <code>publico</code> e cole a URL no parâmetro <code>empresa_logo_url</code>, em Cadastros → Parâmetros.</div>
+        </div>
+      </li>
+      <li>
+        <span class="selo-cat">você</span>
+        <div>
+          <div class="oque">As três tabelas de preço</div>
+          <div class="por">SINAPI/ORSE/SICRO do Piauí, as cotações de fornecedor e os ~85 itens de
+          locação. Entram por CSV exportado direto do Excel. A cotação solar só fecha preço depois
+          da segunda.</div>
+        </div>
+      </li>
+      <li>
+        <span class="selo-cat">você</span>
+        <div>
+          <div class="oque">A base do rateio com o parceiro</div>
+          <div class="por">Item 14.2 da especificação. Está implementado dos dois jeitos e é
+          configurável obra a obra — a tela de Resultado mostra as duas apurações lado a lado, então
+          dá para decidir olhando números reais.</div>
+        </div>
+      </li>
+      <li>
+        <span class="selo-cat espera">Bernardo</span>
+        <div>
+          <div class="oque">O código solar dele</div>
+          <div class="por">A carta em PDF está pronta para mandar. Quando ele responder, cole a
+          resposta na nossa conversa: eu porto o que ele faz e ponho os números dele lado a lado com
+          os que você especificou (HSP 5,4 · PR 0,78 · 30/50/100 kWh · 0,55% ao ano) para você escolher.</div>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ DIÁRIO ============ -->
+  <section>
+    <div class="faixa">
+      <h2>O que eu fiz enquanto você estava fora</h2>
+      <span class="lado">tudo enviado ao GitHub</span>
+    </div>
+    <ul class="diario">
+      <li>
+        <div class="q">Consertei o script de lint, que estava quebrado</div>
+        <div class="d">O <code>npm run lint</code> abria um assistente interativo e travava. Agora
+        roda o ESLint direto. A primeira rodada apontou 9 avisos de import não usado — todos
+        removidos, um a um.</div>
+      </li>
+      <li>
+        <div class="q">Pus o instalador do banco dentro do guia</div>
+        <div class="d">Antes você teria que abrir 1.558 linhas de SQL no GitHub pelo celular e
+        copiar. Agora é um botão. Conferi: copia os 65.592 caracteres byte a byte iguais ao original.</div>
+      </li>
+      <li>
+        <div class="q">Corrigi um obstáculo que eu mesmo tinha inventado</div>
+        <div class="d">O guia dizia que você precisaria resolver a branch antes de publicar.
+        Fui verificar no GitHub: <code>claude/new-session-qhl3bf</code> já é a branch principal.
+        Não há nada a fazer ali.</div>
+      </li>
+      <li>
+        <div class="q">Escrevi a carta para o Bernardo e endereçei com o nome dele</div>
+        <div class="d">Duas páginas em PDF, com as seis perguntas que faltam para copiar o fluxo
+        dele — e uma saída fácil: responder por áudio no WhatsApp.</div>
+      </li>
+      <li>
+        <div class="q">Pus a documentação em dia com a verdade</div>
+        <div class="d">O README dizia 214 testes; são 218. E o PENDENCIAS foi reescrito na ordem do
+        que trava: publicar virou o item 1.</div>
+      </li>
+    </ul>
+  </section>
+
+  <div class="rodape">
+    <div class="nome">Rubens Veras Guimarães</div>
+    Engenheiro Civil · CREA-PI 35900 · RV Engenharia · Teresina/PI<br>
+    Se travar em qualquer passo, me manda o print da tela do erro que eu resolvo na hora.
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var CHAVE = 'rv-painel-passos';
+
+  function ler() {
+    try {
+      var bruto = window.localStorage.getItem(CHAVE);
+      return bruto ? JSON.parse(bruto) : {};
+    } catch (e) { return {}; }
+  }
+  function gravar(estado) {
+    try { window.localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch (e) {}
+  }
+
+  var passos = Array.prototype.slice.call(document.querySelectorAll('.passo'));
+  var contador = document.getElementById('contador');
+  var progresso = document.getElementById('progresso');
+  var estado = ler();
+
+  function desenhar() {
+    var feitos = 0;
+    passos.forEach(function (passo) {
+      var marcado = passo.querySelector('input').checked;
+      passo.classList.toggle('feito', marcado);
+      if (marcado) feitos++;
+    });
+    contador.textContent = feitos + ' de ' + passos.length;
+    progresso.style.width = (feitos / passos.length * 100) + '%';
+  }
+
+  passos.forEach(function (passo) {
+    var caixa = passo.querySelector('input');
+    caixa.checked = estado[passo.dataset.id] === true;
+    caixa.addEventListener('change', function () {
+      estado[passo.dataset.id] = caixa.checked;
+      gravar(estado);
+      desenhar();
+    });
+  });
+
+  desenhar();
+})();
+</script>
