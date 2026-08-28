@@ -5,7 +5,9 @@ verificado: lint limpo, TypeScript sem erro, 251 testes passando, build compilan
 `npm audit --omit=dev` sem vulnerabilidade. Os três testes SQL rodam contra um Postgres de
 verdade, sobre um banco instalado pelo `instalar.sql`.
 
-O que falta não é código. É publicação, conteúdo e duas decisões.
+**Não falta código.** Falta uma coisa só, e ela dura vinte minutos: publicar o app, o que só pode
+ser feito nas suas contas. Todo o resto desta página é ajuste fino, que se resolve com o app já
+funcionando e em uso.
 
 ---
 
@@ -46,32 +48,18 @@ Para trocar depois, é só preencher `empresa_logo_url` em Cadastros → Parâme
 passa a mandar em todo lugar. Se esse endereço um dia falhar, o app volta para a logo que veio
 com ele em vez de gerar documento sem marca.
 
-**As tabelas de preço.** São dados públicos, mas **esta sessão não alcança os sites do governo**:
-o proxy de rede recusa `caixa.gov.br`, `dnit.gov.br` e `cehop.se.gov.br` (403 na conexão). Consigo
-pesquisar e ler resumos, não baixar arquivo. Então o caminho é: você baixa e **anexa o arquivo na
-conversa** — daí eu converto para o formato do importador, e ensino o app a ler o arquivo original
-para os meses seguintes serem só um envio.
+**As tabelas de preço — não são pré-requisito.** Ficou parecendo que o app só serve depois de
+carregar SINAPI, ORSE e SICRO. Não é verdade, e é bom deixar registrado.
 
-Duas coisas que valem saber antes de baixar:
+O preço de reforma depende de serviço, de acesso, de metragem e de cliente. Nenhuma tabela pública
+sabe quanto a RV cobra. Então o caminho é o inverso: **a tabela se enche sozinha, com o uso.** No
+primeiro orçamento você digita o preço direto no item; em Cadastros → Preços de referência, o
+cartão "Novo serviço da RV" guarda esse preço com um código próprio, e ele passa a aparecer na
+busca do orçamento seguinte. Em três ou quatro obras a tabela está formada — e formada com os
+preços reais da RV, não com médias de outro estado.
 
-- **Desonerado ou não desonerado — decidido: NÃO DESONERADA.** É o usual em obra privada. O app
-  já vem com essa opção pré-selecionada na tela de importação, e a versão fica gravada em cada
-  preço: as duas convivem sem uma sobrescrever a outra, e o documento do cliente passa a dizer
-  qual foi usada.
-- **ORSE é a tabela de Sergipe** (CEHOP/SE) — não existe "ORSE do Piauí". Ela costuma entrar como
-  complemento, por ter composições que o SINAPI não tem, mas os preços são da realidade sergipana.
-  O campo `uf` do importador registra isso.
-
-Três bases entram por CSV e ainda estão vazias:
-
-- SINAPI, ORSE e SICRO do Piauí, em Cadastros → Preços referenciais;
-- as cotações dos fornecedores, em Cadastros → Base de preços — é ela que alimenta a cotação
-  solar, então o módulo solar só monta a proposta depois que ela tiver preço de módulo, inversor,
-  estrutura, cabo, string box e material elétrico;
-- os cerca de 85 itens da tabela de locação, em Locação → Equipamentos.
-
-Os três importadores aceitam o CSV exportado direto do Excel, com ponto e vírgula e decimal com
-vírgula.
+O SINAPI só faz falta em obra pública, para justificar preço a órgão. Quando precisar, é só baixar
+e importar; o app já aceita, e já sabe separar a versão desonerada da não desonerada.
 
 ---
 
