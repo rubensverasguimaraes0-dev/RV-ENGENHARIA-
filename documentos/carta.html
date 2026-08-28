@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Como você montou o seu aplicativo?</title>
+<link rel="stylesheet" href="fontes.css">
+<style>
+:root{
+  --tinta:#0d1b26;
+  --rv-900:#073457;
+  --rv-600:#0b4f8a;
+  --sol:#a85e10;
+  --sol-fundo:#fdf4e7;
+  --nevoa:#eef2f6;
+  --linha:#d3dce4;
+  --fraco:#5a6b78;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+@page{size:A4}
+html{font-size:10.5pt}
+body{
+  font-family:'IBM Plex Sans',system-ui,sans-serif;
+  color:var(--tinta);
+  background:#fff;
+  line-height:1.5;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+}
+h1,h2,h3{font-family:'IBM Plex Serif',Georgia,serif;text-wrap:balance;line-height:1.18}
+
+/* ---------- timbre ---------- */
+.timbre{
+  display:flex;align-items:center;gap:10px;
+  padding-bottom:7px;border-bottom:2.5px solid var(--rv-900);
+}
+.marca{
+  width:32px;height:32px;flex:none;border-radius:5px;
+  background:var(--rv-900);color:#fff;
+  font-weight:700;font-size:14px;letter-spacing:-.04em;
+  display:flex;align-items:center;justify-content:center;
+}
+.empresa{font-weight:700;font-size:13px;letter-spacing:.13em;color:var(--rv-900)}
+.assina{font-size:8.5pt;color:var(--fraco);margin-top:1px}
+.data{margin-left:auto;text-align:right;font-family:'IBM Plex Mono',monospace;
+  font-size:8pt;color:var(--fraco);letter-spacing:.02em}
+
+/* ---------- abertura ---------- */
+.abertura{margin-top:16px}
+.etiqueta{
+  font-family:'IBM Plex Mono',monospace;font-size:7.5pt;font-weight:600;
+  letter-spacing:.16em;color:var(--rv-600);text-transform:uppercase;
+}
+h1{font-size:23pt;font-weight:700;color:var(--rv-900);margin-top:5px;letter-spacing:-.015em}
+.subtitulo{font-size:11.5pt;color:var(--fraco);margin-top:4px}
+.saudacao{margin-top:13px;max-width:63ch}
+.saudacao p+p{margin-top:7px}
+
+/* ---------- destaque ---------- */
+.destaque{
+  margin-top:15px;padding:11px 14px;
+  background:var(--sol-fundo);border-left:3px solid var(--sol);border-radius:0 4px 4px 0;
+}
+.destaque h2{font-size:11pt;color:var(--sol);margin-bottom:4px}
+.fluxo{font-size:9.5pt;line-height:1.65}
+.fluxo b{color:var(--tinta);font-weight:600}
+.seta{color:var(--sol);font-weight:600;padding:0 1px}
+
+/* ---------- perguntas ---------- */
+.faixa{
+  display:flex;align-items:baseline;gap:11px;
+  margin-top:22px;padding-bottom:5px;border-bottom:1px solid var(--linha);
+}
+.faixa h2{font-size:13pt;color:var(--rv-900)}
+.faixa span{font-family:'IBM Plex Mono',monospace;font-size:8pt;color:var(--fraco);margin-left:auto}
+
+.p{display:flex;gap:11px;margin-top:12px;break-inside:avoid}
+.n{
+  flex:none;width:21px;height:21px;border-radius:4px;
+  background:var(--rv-900);color:#fff;
+  font-family:'IBM Plex Mono',monospace;font-size:9.5pt;font-weight:600;
+  display:flex;align-items:center;justify-content:center;
+  margin-top:1px;
+}
+.p h3{font-size:11pt;font-weight:600;color:var(--rv-900)}
+.p p{font-size:9.5pt;color:#31424f;margin-top:2px;max-width:66ch}
+.p ul{margin:5px 0 0 0;padding:0;list-style:none;font-size:9.5pt;color:#31424f}
+.p li{padding-left:13px;position:relative;margin-top:2px}
+.p li::before{content:'';position:absolute;left:2px;top:.62em;
+  width:4px;height:4px;border-radius:50%;background:var(--rv-600)}
+.exemplo{
+  margin-top:6px;padding:6px 9px;background:var(--nevoa);border-radius:4px;
+  font-size:8.8pt;color:#31424f;
+}
+.exemplo b{font-weight:600;color:var(--rv-900)}
+
+/* ---------- enviar ---------- */
+.opcoes{list-style:none;margin-top:10px;display:flex;flex-direction:column;gap:7px}
+.opcoes li{
+  display:flex;gap:10px;align-items:baseline;
+  padding:8px 11px;border:1px solid var(--linha);border-radius:5px;font-size:9.5pt;
+}
+.opcoes .marcador{
+  font-family:'IBM Plex Mono',monospace;font-size:8pt;font-weight:600;
+  color:var(--rv-600);flex:none;letter-spacing:.06em;
+}
+.link{
+  margin-top:11px;padding:11px 13px;border-radius:5px;
+  background:var(--rv-900);color:#fff;
+}
+.link .rotulo{font-family:'IBM Plex Mono',monospace;font-size:7.5pt;
+  letter-spacing:.14em;text-transform:uppercase;color:#8fb6d6}
+.link .url{display:block;text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:8.6pt;
+  word-break:break-all;margin-top:3px;color:#fff}
+.link .obs{font-size:8.8pt;color:#c3d7e7;margin-top:5px}
+
+/* ---------- fecho ---------- */
+.fecho{margin-top:22px;padding-top:11px;border-top:2.5px solid var(--rv-900);
+  display:flex;align-items:flex-end;gap:14px}
+.fecho .nome{font-family:'IBM Plex Serif',Georgia,serif;font-size:12pt;
+  font-weight:600;color:var(--rv-900)}
+.fecho .cargo{font-size:8.8pt;color:var(--fraco);margin-top:1px}
+.fecho .obrigado{margin-left:auto;text-align:right;font-size:9pt;color:var(--fraco);max-width:26ch}
+</style>
+</head>
+<body>
+
+<header class="timbre">
+  <div class="marca">RV</div>
+  <div>
+    <div class="empresa">RV ENGENHARIA</div>
+    <div class="assina">Rubens Veras Guimarães · Engenheiro Civil · CREA-PI 35900 · Teresina/PI</div>
+  </div>
+  <div class="data">TERESINA, PI<br>AGOSTO DE 2026</div>
+</header>
+
+<section class="abertura">
+  <div class="etiqueta">Pedido de informação · Módulo de energia solar</div>
+  <h1>Como você montou o seu aplicativo?</h1>
+  <div class="subtitulo">Sem pressa nenhuma — responda quando voltar da viagem.</div>
+
+  <div class="saudacao">
+    <p>Oi, meu amigo! Tudo bem?</p>
+    <p>Estou montando o sistema interno da RV Engenharia — obras civis, reformas, locação de
+    equipamentos e energia solar. A parte de solar do seu aplicativo é a mais bem organizada que
+    eu já vi: o cliente manda a conta de luz e a proposta sai na hora, sem enrolação. É exatamente
+    isso que eu quero ter aqui.</p>
+    <p>Como sei que você está viajando, deixei tudo por escrito, em <b>seis perguntas curtas</b>.
+    Não precisa sentar no computador: pode responder por áudio no WhatsApp, do jeito que for mais
+    fácil pra você.</p>
+  </div>
+</section>
+
+<div class="destaque">
+  <h2>O que eu quero copiar</h2>
+  <div class="fluxo">
+    O caminho inteiro, do começo ao fim:
+    <b>recebe a conta de luz</b> <span class="seta">→</span>
+    <b>lê o consumo</b> <span class="seta">→</span>
+    <b>dimensiona o sistema</b> <span class="seta">→</span>
+    <b>monta o preço</b> <span class="seta">→</span>
+    <b>gera a proposta</b> <span class="seta">→</span>
+    <b>manda pro cliente</b>. Sem nenhuma etapa manual no meio.
+  </div>
+</div>
+
+<div class="faixa">
+  <h2>As seis perguntas</h2>
+  <span>responda na ordem que quiser</span>
+</div>
+
+<div class="p">
+  <div class="n">1</div>
+  <div>
+    <h3>Com o que você gerou o aplicativo?</h3>
+    <p>Se foi com alguma inteligência artificial (Claude, ChatGPT, Cursor, Lovable, v0, Replit…),
+    me diga qual. E, se você ainda tiver guardados, <b>os textos que você pediu pra ela</b> — é o
+    que mais me ajuda de tudo.</p>
+  </div>
+</div>
+
+<div class="p">
+  <div class="n">2</div>
+  <div>
+    <h3>Do que ele é feito?</h3>
+    <p>Linguagem e framework, o banco de dados, e onde ele está hospedado. Uma linha de cada já
+    resolve.</p>
+  </div>
+</div>
+
+<div class="p">
+  <div class="n">3</div>
+  <div>
+    <h3>O caminho da conta até a proposta</h3>
+    <p>Quais telas aparecem, nessa ordem, desde anexar a conta de luz até a proposta ficar pronta.
+    Pode ser em tópicos — ou simplesmente prints do celular, que já dizem tudo.</p>
+  </div>
+</div>
+
+<div class="p">
+  <div class="n">4</div>
+  <div>
+    <h3>As contas do dimensionamento <span style="font-weight:500;color:var(--sol)">— a mais importante</span></h3>
+    <p>Quais números você usa para transformar o consumo em kWp e em quantidade de módulos:</p>
+    <ul>
+      <li>as horas de sol por dia (HSP) que você adota na sua região</li>
+      <li>o fator de perdas do sistema (PR / performance ratio)</li>
+      <li>o consumo mínimo que a concessionária cobra mesmo com o sistema ligado — monofásico, bifásico e trifásico</li>
+      <li>a perda de geração por ano (degradação dos módulos)</li>
+      <li>e a fórmula que amarra tudo isso</li>
+    </ul>
+    <div class="exemplo"><b>Se for mais rápido:</b> me manda só um caso real que você já fez —
+    “conta de 450 kWh/mês virou tantos kWp, tantos módulos, economia de tanto por mês”. Com um
+    exemplo desses eu consigo conferir se as minhas contas batem com as suas.</div>
+  </div>
+</div>
+
+<div class="p">
+  <div class="n">5</div>
+  <div>
+    <h3>De onde vem o preço</h3>
+    <p>Você usa preço por kWp, tabela de kit fechado, ou cotação de fornecedor a cada proposta?
+    E como entram a mão de obra e a sua margem no valor final?</p>
+  </div>
+</div>
+
+<div class="p">
+  <div class="n">6</div>
+  <div>
+    <h3>Como a proposta chega ao cliente</h3>
+    <p>Ela sai em PDF? Vai por WhatsApp com um texto já pronto? Se puder me mandar
+    <b>uma proposta antiga</b>, com os dados do cliente apagados, me ajuda demais a copiar o
+    formato.</p>
+  </div>
+</div>
+
+<div class="faixa">
+  <h2>E se der pra mandar o código</h2>
+  <span>aí fica ainda mais fácil</span>
+</div>
+
+<p style="font-size:9.5pt;color:#31424f;margin-top:9px;max-width:66ch">Qualquer um destes serve.
+Não precisa organizar, nem limpar, nem explicar nada — do jeito que estiver está ótimo:</p>
+
+<ul class="opcoes">
+  <li><span class="marcador">A</span><span>O <b>link do repositório</b> (GitHub, GitLab, Bitbucket). Se for privado, é só me adicionar como colaborador.</span></li>
+  <li><span class="marcador">B</span><span>Um <b>.zip da pasta do projeto</b> inteiro.</span></li>
+  <li><span class="marcador">C</span><span>Só a <b>pasta do módulo solar</b> — as telas e o arquivo onde ficam as contas do dimensionamento.</span></li>
+  <li><span class="marcador">D</span><span>Ou nada disso: <b>áudio no WhatsApp</b> respondendo as seis perguntas. Já resolve.</span></li>
+</ul>
+
+<div class="link">
+  <div class="rotulo">Página pronta esperando o envio</div>
+  <a class="url" href="https://claude.ai/code/artifact/84ba33b8-425d-4341-9f4b-16c367277811">https://claude.ai/code/artifact/84ba33b8-425d-4341-9f4b-16c367277811</a>
+  <div class="obs">Abre no celular, cola o que você tiver e clica em enviar. Se preferir, manda
+  direto pra mim no WhatsApp — dá na mesma.</div>
+</div>
+
+<div class="fecho">
+  <div>
+    <div class="nome">Rubens Veras Guimarães</div>
+    <div class="cargo">Engenheiro Civil · CREA-PI 35900 · RV Engenharia · Teresina/PI</div>
+  </div>
+  <div class="obrigado">Obrigado, de verdade. Boa viagem — responde quando puder.</div>
+</div>
+
+</body>
+</html>
