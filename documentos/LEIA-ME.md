@@ -27,3 +27,11 @@ await p.pdf({
 })
 await nav.close()
 ```
+
+## `guia-de-instalacao.html`
+
+Guia de instalacao em tres fases (Supabase, Vercel, celular), com o
+`supabase/instalar.sql` embutido para copiar de uma vez so — abre em
+qualquer navegador, sem precisar de servidor.
+
+Publicado em https://claude.ai/code/artifact/f84d35b4-76db-4505-99a3-70ad94da1a22
