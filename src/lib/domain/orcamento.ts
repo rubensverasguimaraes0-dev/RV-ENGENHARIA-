@@ -21,6 +21,8 @@ export interface ItemOrcamento {
   fase: string | null
   codigo_referencia: string | null
   base_referencia: BaseReferencia
+  referencia_data_base?: string | null
+  referencia_desonerado?: boolean | null
   descricao: string
   unidade: string | null
   quantidade: number | null
@@ -230,4 +232,53 @@ export const ROTULO_MODO_BDI: Record<ModoBdi, string> = {
   visivel: 'BDI visível como linha (versão interna)',
   embutido: 'BDI embutido no preço unitário (versão do cliente)',
   sem_bdi: 'Sem BDI',
+}
+
+/**
+ * Como a tabela de referencia aparece no documento do cliente.
+ *
+ * "SINAPI 88489" sozinho nao permite conferir nada: o mesmo codigo tem preco
+ * diferente a cada mes, e diferente ainda entre a versao desonerada e a nao
+ * desonerada. O documento precisa dizer qual das duas, de qual mes.
+ */
+export function rotuloDaReferencia(r: {
+  base: string
+  data_base?: string | null
+  desonerado?: boolean | null
+}): string {
+  const partes = [r.base]
+
+  if (r.data_base) {
+    // data de calendario e texto aaaa-mm-dd: virar Date aqui devolveria o mes
+    // anterior em qualquer fuso a oeste de Greenwich.
+    const [ano, mes] = r.data_base.split('-')
+    if (ano && mes) partes.push(`${mes}/${ano}`)
+  }
+
+  if (r.desonerado === true) partes.push('desonerada')
+  else if (r.desonerado === false) partes.push('nao desonerada')
+
+  return partes.join(' · ')
+}
+
+/** As tabelas de referencia efetivamente usadas por um orcamento, sem repetir. */
+export function referenciasUsadas(
+  itens: {
+    base_referencia: BaseReferencia
+    referencia_data_base?: string | null
+    referencia_desonerado?: boolean | null
+  }[],
+): string[] {
+  const vistas = new Set<string>()
+  for (const item of itens) {
+    if (item.base_referencia === 'proprio') continue
+    vistas.add(
+      rotuloDaReferencia({
+        base: item.base_referencia,
+        data_base: item.referencia_data_base ?? null,
+        desonerado: item.referencia_desonerado ?? null,
+      }),
+    )
+  }
+  return [...vistas].sort()
 }

@@ -150,7 +150,7 @@ export async function importarComposicao(form: FormData) {
 
   const { data: preco } = await supabase
     .from('precos_referencia')
-    .select('base, codigo, descricao, unidade, preco_unitario')
+    .select('base, codigo, descricao, unidade, preco_unitario, data_base, desonerado')
     .eq('id', preco_id)
     .maybeSingle()
 
@@ -171,6 +171,9 @@ export async function importarComposicao(form: FormData) {
     unidade: preco.unidade,
     quantidade: 1,
     preco_unitario: Number(preco.preco_unitario ?? 0),
+    // congela de onde o preco veio, junto com o preco
+    referencia_data_base: preco.data_base ?? null,
+    referencia_desonerado: preco.desonerado ?? null,
     ordem: Number(ultimo?.[0]?.ordem ?? 0) + 1,
   })
 
@@ -216,7 +219,7 @@ async function recalcularTotal(orcamentoId: string) {
     supabase
       .from('itens_orcamento')
       .select(
-        'id, fase, codigo_referencia, base_referencia, descricao, unidade, quantidade, custo_material, custo_mao_obra, preco_unitario, terceirizado_sem_valor, ordem, pendencia',
+        'id, fase, codigo_referencia, base_referencia, referencia_data_base, referencia_desonerado, descricao, unidade, quantidade, custo_material, custo_mao_obra, preco_unitario, terceirizado_sem_valor, ordem, pendencia',
       )
       .eq('orcamento_id', orcamentoId)
       .is('excluido_em', null),

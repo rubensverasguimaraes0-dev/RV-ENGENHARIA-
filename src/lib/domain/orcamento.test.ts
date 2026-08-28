@@ -1,13 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  calcularItem,
-  calcularOrcamento,
-  compararFases,
-  custoPorUnidade,
-  montarFases,
-  type ConfiguracaoOrcamento,
-  type ItemOrcamento,
-} from './orcamento'
+import { calcularItem, calcularOrcamento, compararFases, custoPorUnidade, montarFases, referenciasUsadas, rotuloDaReferencia, type ConfiguracaoOrcamento, type ItemOrcamento } from './orcamento'
 import { formatarMoeda } from '@/lib/format'
 
 let n = 0
@@ -245,5 +237,43 @@ describe('custo por unidade (spec 6.2)', () => {
 
   it('não divide por zero', () => {
     expect(custoPorUnidade(100000, 0, 0.3)).toEqual({ custo_unitario: 0, preco_sugerido: 0 })
+  })
+})
+
+describe('a origem do preço no documento do cliente', () => {
+  it('nomeia a tabela com mês e versão — "SINAPI 88489" sozinho não permite conferir nada', () => {
+    expect(rotuloDaReferencia({ base: 'SINAPI', data_base: '2026-04-01', desonerado: false }))
+      .toBe('SINAPI · 04/2026 · nao desonerada')
+    expect(rotuloDaReferencia({ base: 'SINAPI', data_base: '2026-04-01', desonerado: true }))
+      .toBe('SINAPI · 04/2026 · desonerada')
+  })
+
+  it('omite o que não sabe, em vez de inventar', () => {
+    expect(rotuloDaReferencia({ base: 'ORSE' })).toBe('ORSE')
+    expect(rotuloDaReferencia({ base: 'SICRO', data_base: null, desonerado: null })).toBe('SICRO')
+    expect(rotuloDaReferencia({ base: 'SINAPI', desonerado: false })).toBe('SINAPI · nao desonerada')
+  })
+
+  it('lê o mês do texto da data, sem passar por Date — janeiro não pode virar dezembro', () => {
+    // new Date('2026-01-01') em fuso a oeste devolve 31/12/2025
+    expect(rotuloDaReferencia({ base: 'SINAPI', data_base: '2026-01-01' })).toContain('01/2026')
+    expect(rotuloDaReferencia({ base: 'SINAPI', data_base: '2026-12-01' })).toContain('12/2026')
+  })
+
+  it('lista as tabelas usadas sem repetir, e ignora item de preço próprio', () => {
+    const itens = [
+      { base_referencia: 'SINAPI' as const, referencia_data_base: '2026-04-01', referencia_desonerado: false },
+      { base_referencia: 'SINAPI' as const, referencia_data_base: '2026-04-01', referencia_desonerado: false },
+      { base_referencia: 'ORSE' as const, referencia_data_base: '2026-03-01', referencia_desonerado: false },
+      { base_referencia: 'proprio' as const, referencia_data_base: null, referencia_desonerado: null },
+    ]
+    expect(referenciasUsadas(itens)).toEqual([
+      'ORSE · 03/2026 · nao desonerada',
+      'SINAPI · 04/2026 · nao desonerada',
+    ])
+  })
+
+  it('um orçamento só com preço próprio não anuncia tabela nenhuma', () => {
+    expect(referenciasUsadas([{ base_referencia: 'proprio' as const }])).toEqual([])
   })
 })

@@ -1,8 +1,8 @@
 # Pendências
 
 Os catorze itens da ordem de construção da especificação estão entregues, e o código está
-verificado: lint limpo, TypeScript sem erro, 246 testes passando, build compilando as 50 rotas e
-`npm audit --omit=dev` sem vulnerabilidade. Os dois testes SQL rodam contra um Postgres de
+verificado: lint limpo, TypeScript sem erro, 251 testes passando, build compilando as 50 rotas e
+`npm audit --omit=dev` sem vulnerabilidade. Os três testes SQL rodam contra um Postgres de
 verdade, sobre um banco instalado pelo `instalar.sql`.
 
 O que falta não é código. É publicação, conteúdo e duas decisões.
@@ -54,9 +54,10 @@ para os meses seguintes serem só um envio.
 
 Duas coisas que valem saber antes de baixar:
 
-- **Desonerado ou não desonerado.** O SINAPI publica as duas versões, e a diferença aparece em
-  todo preço com mão de obra. Para obra privada, o usual é a **não desonerada**; a decisão é sua,
-  como responsável técnico.
+- **Desonerado ou não desonerado — decidido: NÃO DESONERADA.** É o usual em obra privada. O app
+  já vem com essa opção pré-selecionada na tela de importação, e a versão fica gravada em cada
+  preço: as duas convivem sem uma sobrescrever a outra, e o documento do cliente passa a dizer
+  qual foi usada.
 - **ORSE é a tabela de Sergipe** (CEHOP/SE) — não existe "ORSE do Piauí". Ela costuma entrar como
   complemento, por ter composições que o SINAPI não tem, mas os preços são da realidade sergipana.
   O campo `uf` do importador registra isso.

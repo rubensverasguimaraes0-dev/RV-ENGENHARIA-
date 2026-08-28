@@ -99,7 +99,7 @@ navegador, sem servidor.
 ## Testes
 
 ```bash
-npm test          # 246 testes das regras de negócio, do CSV e das planilhas geradas
+npm test          # 251 testes das regras de negócio, do CSV e das planilhas geradas
 npm run lint      # ESLint com as regras do Next.js
 npm run typecheck # TypeScript em modo estrito
 npm run build     # build de produção
@@ -119,6 +119,7 @@ contrato, custo, orçamento nem resultado:
 ```bash
 psql -v ON_ERROR_STOP=1 -f supabase/tests/rls_test.sql
 psql -v ON_ERROR_STOP=1 -f supabase/tests/identidade_test.sql
+psql -v ON_ERROR_STOP=1 -f supabase/tests/desoneracao_test.sql
 ```
 
 O segundo prova as duas metades da regra da identidade: o lançador **precisa** ler nome, logo e

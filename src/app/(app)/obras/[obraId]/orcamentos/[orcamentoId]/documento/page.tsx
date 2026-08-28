@@ -8,6 +8,7 @@ import { colunasDoRelatorio, versaoDaQuery, versaoParaCliente } from '@/lib/doma
 import { Documento, BlocoDados, BarraImpressao } from '@/components/documento'
 import { BotaoImprimir } from '@/components/botao-imprimir'
 import { formatarData, formatarMoeda, formatarNumero, formatarPercentual } from '@/lib/format'
+import { referenciasUsadas } from '@/lib/domain/orcamento'
 
 /**
  * Documento do orcamento (spec 4.13), com as versoes de exibicao do item 4.14.
@@ -231,6 +232,14 @@ export default async function DocumentoOrcamento({
               />
             }
           >
+            {/* Sem a data-base e a versao, "SINAPI 88489" nao permite conferir
+                nada: o mesmo codigo muda de preco todo mes, e muda de novo
+                entre a versao desonerada e a nao desonerada. */}
+            {referenciasUsadas(calculo.itens).length > 0 && (
+              <p className="mb-2 text-[11px] text-slate-700">
+                <strong>Tabelas utilizadas:</strong> {referenciasUsadas(calculo.itens).join(' · ')}
+              </p>
+            )}
             <table className="tabela">
               <thead>
                 <tr>

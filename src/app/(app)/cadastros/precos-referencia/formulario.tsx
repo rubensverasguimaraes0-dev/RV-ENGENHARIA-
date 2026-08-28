@@ -17,6 +17,16 @@ export function FormularioImportacao() {
           { valor: 'SICRO', rotulo: 'SICRO' },
         ]}
       />
+      <Selecao
+        rotulo="Versão da tabela"
+        nome="desonerado"
+        valor="nao"
+        opcoes={[
+          { valor: 'nao', rotulo: 'Não desonerada — usual em obra privada' },
+          { valor: 'sim', rotulo: 'Desonerada — sem INSS sobre a folha' },
+        ]}
+        dica="Muda todo preço que tem mão de obra. As duas convivem sem se sobrescrever."
+      />
       <div className="grid grid-cols-2 gap-2">
         <Campo rotulo="UF" nome="uf" valor="PI" />
         <Campo

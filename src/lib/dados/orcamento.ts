@@ -87,7 +87,7 @@ export async function carregarOrcamento(orcamentoId: string): Promise<{
   const { data: itensData } = await supabase
     .from('itens_orcamento')
     .select(
-      'id, fase, codigo_referencia, base_referencia, descricao, unidade, quantidade, custo_material, custo_mao_obra, preco_unitario, terceirizado_sem_valor, ordem, pendencia, observacao',
+      'id, fase, codigo_referencia, base_referencia, referencia_data_base, referencia_desonerado, descricao, unidade, quantidade, custo_material, custo_mao_obra, preco_unitario, terceirizado_sem_valor, ordem, pendencia, observacao',
     )
     .eq('orcamento_id', orcamentoId)
     .is('excluido_em', null)

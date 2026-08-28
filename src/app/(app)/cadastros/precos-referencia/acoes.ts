@@ -19,6 +19,8 @@ export async function importarPrecos(_e: EstadoForm | null, form: FormData): Pro
   const base = textoObrigatorio(form.get('base'))
   const uf = textoObrigatorio(form.get('uf')) || 'PI'
   const dataBaseForm = lerData(String(form.get('data_base') ?? ''))
+  // O SINAPI publica as duas versoes; a RV usa a nao desonerada.
+  const desonerado = String(form.get('desonerado') ?? 'nao') === 'sim'
   const arquivo = form.get('arquivo')
 
   if (!base) return { erro: 'Selecione a base (SINAPI, ORSE ou SICRO).' }
@@ -36,6 +38,7 @@ export async function importarPrecos(_e: EstadoForm | null, form: FormData): Pro
     preco_unitario: number
     data_base: string | null
     uf: string
+    desonerado: boolean
   }[] = []
   let ignoradas = 0
 
@@ -59,6 +62,7 @@ export async function importarPrecos(_e: EstadoForm | null, form: FormData): Pro
       preco_unitario: preco,
       data_base: dataBaseForm ?? lerData(coluna(linha, 'data base', 'data_base')) ?? null,
       uf,
+      desonerado,
     })
   }
 
@@ -75,7 +79,7 @@ export async function importarPrecos(_e: EstadoForm | null, form: FormData): Pro
     const { error } = await supabase
       .from('precos_referencia')
       .upsert(registros.slice(i, i + TAMANHO), {
-        onConflict: 'base,codigo,data_base,uf',
+        onConflict: 'base,codigo,data_base,uf,desonerado',
         ignoreDuplicates: false,
       })
     if (error) {
