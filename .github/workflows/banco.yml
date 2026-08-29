@@ -1,0 +1,62 @@
+# =============================================================================
+# Migrar banco — o robo que aplica as migracoes no Supabase sozinho.
+#
+# Dispara quando chega migracao nova no repositorio, ou quando alguem clica em
+# "Run workflow" na aba Actions. Nao precisa abrir o SQL Editor para nada.
+#
+# Depende de UM segredo do repositorio: SUPABASE_DB_URL.
+# Enquanto ele nao existir, o robo avisa e nao faz nada (nao quebra o envio).
+# =============================================================================
+name: Migrar banco
+
+on:
+  push:
+    # So as branches principais mexem no banco de verdade. Branch de
+    # experimento nao encosta em producao.
+    branches:
+      - main
+      - claude/new-session-qhl3bf
+    paths:
+      - 'supabase/migrations/**'
+      - 'scripts/migrar-banco.mjs'
+      - '.github/workflows/banco.yml'
+  workflow_dispatch:
+    inputs:
+      apenas_listar:
+        description: 'So mostrar o que esta pendente, sem aplicar'
+        type: boolean
+        default: false
+
+# Duas migracoes ao mesmo tempo no mesmo banco, nunca.
+concurrency:
+  group: migrar-banco
+  cancel-in-progress: false
+
+jobs:
+  migrar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Garantir o psql
+        run: command -v psql || (sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client)
+
+      - name: Aplicar migracoes
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          APENAS_LISTAR: ${{ inputs.apenas_listar }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::warning title=Segredo faltando::Cadastre SUPABASE_DB_URL em Settings > Secrets and variables > Actions para o banco se atualizar sozinho."
+            echo "Sem o segredo SUPABASE_DB_URL nao ha o que fazer. Nada foi alterado."
+            exit 0
+          fi
+          if [ "$APENAS_LISTAR" = "true" ]; then
+            node scripts/migrar-banco.mjs --listar
+          else
+            node scripts/migrar-banco.mjs
+          fi
