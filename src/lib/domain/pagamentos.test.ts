@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  agruparPorMes,
   calcularParcelaBalao,
   parcelasParaAnexar,
   resumirCronograma,
@@ -108,5 +109,82 @@ describe('caso 19 — comprovantes anexados ao final do cronograma', () => {
 
   it('sem comprovante nenhum, não há anexo', () => {
     expect(parcelasParaAnexar([{ ...parcela('p1'), comprovante_assinado: null }])).toEqual([])
+  })
+})
+
+
+describe('percentual quitado do contrato', () => {
+  const contrato = 6_702_964
+
+  it('e a fracao do contrato ja recebida', () => {
+    const r = resumirCronograma(
+      [
+        parcela('p1', { valor_previsto: 500_000, valor_recebido: 500_000 }),
+        parcela('p2', { valor_previsto: 500_000, valor_recebido: 500_000 }),
+        parcela('p3', { valor_previsto: 500_000, valor_recebido: 500_000 }),
+        parcela('p4', { valor_previsto: 500_000, valor_recebido: 500_000 }),
+      ],
+      contrato,
+      '2026-08-29',
+    )
+    // R$ 20.000,00 de R$ 67.029,64 = 29,8%
+    expect(Math.round(r.percentual_quitado * 1000) / 10).toBe(29.8)
+  })
+
+  it('desconta o que pertence a outro contrato antes de calcular', () => {
+    const r = resumirCronograma(
+      [parcela('p1', { valor_recebido: 500_000, valor_outro_contrato: 250_000 })],
+      1_000_000,
+      '2026-08-29',
+    )
+    expect(r.percentual_quitado).toBe(0.25)
+  })
+
+  it('obra sem contrato fechado nao vira Infinity na tela', () => {
+    const r = resumirCronograma([parcela('p1', { valor_recebido: 500_000 })], 0, '2026-08-29')
+    expect(r.percentual_quitado).toBe(0)
+  })
+})
+
+describe('cronograma agrupado por mes de vencimento', () => {
+  const parcelas = [
+    parcela('p1', { numero_parcela: 1, data_prevista: '2026-07-23', valor_previsto: 500_000, valor_recebido: 500_000 }),
+    parcela('p2', { numero_parcela: 2, data_prevista: '2026-08-01', valor_previsto: 500_000, valor_recebido: 500_000 }),
+    parcela('p3', { numero_parcela: 3, data_prevista: '2026-08-08', valor_previsto: 500_000 }),
+    parcela('p4', { numero_parcela: 4, data_prevista: null, valor_previsto: 702_964 }),
+  ]
+
+  it('junta as parcelas do mesmo mes sob uma faixa so', () => {
+    const meses = agruparPorMes(parcelas)
+    expect(meses.map((m) => m.rotulo)).toEqual([
+      'JULHO/2026',
+      'AGOSTO/2026',
+      'SEM VENCIMENTO DEFINIDO',
+    ])
+    expect(meses[1]?.parcelas.map((p) => p.numero_parcela)).toEqual([2, 3])
+  })
+
+  it('soma previsto e recebido dentro de cada mes', () => {
+    const agosto = agruparPorMes(parcelas)[1]
+    expect(agosto?.previsto).toBe(1_000_000)
+    expect(agosto?.recebido).toBe(500_000)
+  })
+
+  it('a parcela sem vencimento nao some do documento — vai para o fim', () => {
+    const meses = agruparPorMes(parcelas)
+    expect(meses.at(-1)?.parcelas.map((p) => p.numero_parcela)).toEqual([4])
+    const total = meses.reduce((s, m) => s + m.parcelas.length, 0)
+    expect(total).toBe(parcelas.length)
+  })
+
+  it('a virada do mes nao escorrega de fuso: dia 01 fica no proprio mes', () => {
+    const meses = agruparPorMes([
+      parcela('x', { data_prevista: '2026-09-01', valor_previsto: 100 }),
+    ])
+    expect(meses[0]?.rotulo).toBe('SETEMBRO/2026')
+  })
+
+  it('cronograma vazio nao gera faixa nenhuma', () => {
+    expect(agruparPorMes([])).toEqual([])
   })
 })

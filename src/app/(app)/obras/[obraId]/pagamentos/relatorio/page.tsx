@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { exigirAdmin } from '@/lib/supabase/sessao'
@@ -5,14 +6,16 @@ import { carregarObra } from '@/lib/dados/obra'
 import { listarParcelas } from '@/lib/dados/pagamentos'
 import { carregarParametros, dadosEmpresa } from '@/lib/parametros'
 import {
+  agruparPorMes,
   parcelasParaAnexar,
   resumirCronograma,
   statusDaParcela,
   valorEfetivo,
 } from '@/lib/domain/pagamentos'
 import { Documento, BlocoDados, BarraImpressao } from '@/components/documento'
+import { PainelIndicadores } from '@/components/painel-indicadores'
 import { BotaoImprimir } from '@/components/botao-imprimir'
-import { formatarData, formatarMoeda, hojeISO } from '@/lib/format'
+import { formatarData, formatarMoeda, formatarPercentual, hojeISO } from '@/lib/format'
 
 /**
  * Cronograma em PDF com os comprovantes anexados ao final, mostrando
@@ -35,6 +38,7 @@ export default async function RelatorioCronograma({
   const empresa = dadosEmpresa(parametros)
   const cliente = obra.pagador ?? obra.cliente
   const comComprovante = parcelasParaAnexar(parcelas)
+  const meses = agruparPorMes(parcelas)
 
   return (
     <>
@@ -61,6 +65,19 @@ export default async function RelatorioCronograma({
           />
         }
       >
+        <PainelIndicadores
+          itens={[
+            { rotulo: 'Valor do contrato', valor: formatarMoeda(obra.valor_contrato) },
+            {
+              rotulo: 'Total pago',
+              valor: formatarMoeda(resumo.total_recebido_nesta_obra),
+              tom: 'pago',
+            },
+            { rotulo: 'Saldo a pagar', valor: formatarMoeda(resumo.saldo_contrato), tom: 'saldo' },
+            { rotulo: 'Quitado', valor: formatarPercentual(resumo.percentual_quitado, 1) },
+          ]}
+        />
+
         <table className="tabela">
           <thead>
             <tr>
@@ -73,26 +90,40 @@ export default async function RelatorioCronograma({
             </tr>
           </thead>
           <tbody>
-            {parcelas.map((p) => {
-              const st = statusDaParcela(p, hoje)
-              return (
-                <tr key={p.id}>
-                  <td>
-                    {p.numero_parcela}
-                    {p.balao ? ' (saldo)' : ''}
-                  </td>
-                  <td>{p.data_prevista ? formatarData(p.data_prevista) : '—'}</td>
-                  <td className="num">{formatarMoeda(p.valor_previsto)}</td>
-                  <td>
-                    {p.data_recebimento ? formatarData(p.data_recebimento) : st === 'atrasada' ? 'em atraso' : '—'}
-                  </td>
-                  <td>{p.forma_pagamento ?? '—'}</td>
-                  <td className="num">
-                    {p.valor_recebido === null ? '—' : formatarMoeda(valorEfetivo(p))}
-                  </td>
+            {meses.map((mes) => (
+              <Fragment key={mes.chave || 'sem-vencimento'}>
+                <tr className="secao">
+                  <td colSpan={2}>{mes.rotulo}</td>
+                  <td className="num">{formatarMoeda(mes.previsto)}</td>
+                  <td colSpan={2}></td>
+                  <td className="num">{mes.recebido > 0 ? formatarMoeda(mes.recebido) : ''}</td>
                 </tr>
-              )
-            })}
+                {mes.parcelas.map((p) => {
+                  const st = statusDaParcela(p, hoje)
+                  return (
+                    <tr key={p.id} className={st === 'paga' ? 'quitada' : st === 'atrasada' ? 'atrasada' : ''}>
+                      <td>
+                        {p.numero_parcela}
+                        {p.balao ? ' (saldo)' : ''}
+                      </td>
+                      <td>{p.data_prevista ? formatarData(p.data_prevista) : '—'}</td>
+                      <td className="num">{formatarMoeda(p.valor_previsto)}</td>
+                      <td>
+                        {p.data_recebimento
+                          ? formatarData(p.data_recebimento)
+                          : st === 'atrasada'
+                            ? 'em atraso'
+                            : '—'}
+                      </td>
+                      <td>{p.forma_pagamento ?? '—'}</td>
+                      <td className="num">
+                        {p.valor_recebido === null ? '—' : formatarMoeda(valorEfetivo(p))}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </Fragment>
+            ))}
             <tr className="subtotal">
               <td colSpan={2}>Total previsto</td>
               <td className="num">{formatarMoeda(resumo.total_previsto)}</td>

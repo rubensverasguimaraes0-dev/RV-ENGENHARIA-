@@ -5,7 +5,7 @@ import { carregarObra } from '@/lib/dados/obra'
 import { listarParcelas } from '@/lib/dados/pagamentos'
 import { resumirCronograma, statusDaParcela, valorEfetivo } from '@/lib/domain/pagamentos'
 import { TituloPagina, Cartao, Indicador, Etiqueta, Vazio, Moeda } from '@/components/ui'
-import { formatarData, formatarMoeda, hojeISO } from '@/lib/format'
+import { formatarData, formatarMoeda, formatarPercentual, hojeISO } from '@/lib/format'
 import { FormularioParcela, FormularioRecebimento } from './formulario'
 import { arquivarParcela } from './acoes'
 
@@ -46,7 +46,7 @@ export default async function PaginaPagamentos({
         }
       />
 
-      <div className="grid gap-2 sm:grid-cols-4 mb-3">
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5 mb-3">
         <Indicador rotulo="Contrato" valor={formatarMoeda(obra.valor_contrato)} />
         <Indicador
           rotulo="Recebido nesta obra"
@@ -62,6 +62,11 @@ export default async function PaginaPagamentos({
           rotulo="Saldo"
           valor={formatarMoeda(resumo.saldo_contrato)}
           tom={resumo.saldo_contrato > 0 ? 'alerta' : 'ok'}
+        />
+        <Indicador
+          rotulo="Quitado"
+          valor={formatarPercentual(resumo.percentual_quitado, 1)}
+          detalhe={obra.valor_contrato === 0 ? 'obra sem valor de contrato' : undefined}
         />
         <Indicador
           rotulo="Parcelas atrasadas"

@@ -76,6 +76,20 @@ body {
   text-transform: uppercase;
   font-size: 12px;
 }
+/* Parcela quitada: verde discreto. A cor e reforco, nunca a unica informacao —
+   a linha continua trazendo a data do pagamento escrita. */
+.tabela tr.quitada td {
+  background: #eaf7ee;
+}
+.tabela tr.quitada td:first-child {
+  border-left: 3px solid #1f8a4c;
+}
+.tabela tr.atrasada td {
+  background: #fdeeee;
+}
+.tabela tr.atrasada td:first-child {
+  border-left: 3px solid #b3261e;
+}
 .tabela tr.subtotal td {
   background: #f4f7fb;
   font-weight: 600;
@@ -85,7 +99,7 @@ body {
   color: #fff;
   font-weight: 700;
 }
-.tabela tbody tr:nth-child(even):not(.secao):not(.subtotal):not(.total) td {
+.tabela tbody tr:nth-child(even):not(.secao):not(.subtotal):not(.total):not(.quitada):not(.atrasada) td {
   background: #fafcfe;
 }
 .num {
@@ -292,6 +306,37 @@ body {
   .aviso-balao { animation: none; }
   .girando { animation-duration: 2s; }
 }
+
+/* --- Painel de indicadores ------------------------------------------------- */
+/* Quatro numeros que respondem "como esta a obra" sem ler a tabela inteira. */
+.painel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.indicador {
+  border: 1px solid #b9cadb;
+  border-top: 3px solid var(--color-rv-800);
+  padding: 6px 8px;
+  background: #fff;
+}
+.indicador-rotulo {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #4a5b6d;
+}
+.indicador-valor {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-rv-900);
+  font-variant-numeric: tabular-nums;
+}
+.indicador-pago { border-top-color: #1f8a4c; }
+.indicador-pago .indicador-valor { color: #17663a; }
+.indicador-saldo { border-top-color: #b26a00; }
+.indicador-saldo .indicador-valor { color: #8a5200; }
 
 /* --- Documentos A4 --------------------------------------------------------- */
 .folha {

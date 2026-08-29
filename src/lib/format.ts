@@ -159,6 +159,24 @@ export function nomeDoDia(iso: DataISO): string {
   return NOMES_DIA[diaDaSemana(iso)] ?? ''
 }
 
+const NOMES_MES = [
+  'JANEIRO', 'FEVEREIRO', 'MARCO', 'ABRIL', 'MAIO', 'JUNHO',
+  'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO',
+] as const
+
+/**
+ * 2026-07-23 => JULHO/2026, para a faixa de mes do cronograma.
+ *
+ * Le o mes direto do texto, sem passar por Date: `new Date('2026-07-01')` e
+ * meia-noite em UTC, que no fuso de Teresina cai no dia 30 de junho — e a
+ * faixa sairia com o mes errado justamente na virada.
+ */
+export function nomeDoMes(iso: DataISO): string {
+  const m = RE_ISO.exec(iso)
+  if (!m) return iso
+  return `${NOMES_MES[Number(m[2]) - 1] ?? ''}/${m[1]}`
+}
+
 /** Segunda-feira da semana que contem a data. */
 export function segundaDaSemana(iso: DataISO): DataISO {
   const dow = diaDaSemana(iso)
