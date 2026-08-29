@@ -5,6 +5,7 @@ import { criarClienteServidor } from '@/lib/supabase/server'
 import { listarObrasVisiveis } from '@/lib/dados/obra'
 import { TituloPagina, Cartao } from '@/components/ui'
 import { FormularioNota } from './formulario'
+import { leituraConfigurada } from '@/lib/ia/ler-nota'
 
 export default async function PaginaNovaNota({
   params,
@@ -44,6 +45,7 @@ export default async function PaginaNovaNota({
             fornecedores={(fornecedoresData ?? []) as { id: string; nome: string }[]}
             locais={(locaisData ?? []) as { id: string; nome: string }[]}
             ehAdmin={usuario.perfil === 'admin'}
+            leituraDisponivel={leituraConfigurada()}
           />
         </Cartao>
       </div>
