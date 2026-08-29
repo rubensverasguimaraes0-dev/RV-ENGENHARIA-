@@ -65,6 +65,10 @@ Sem as variáveis de ambiente o app abre em `/configurar`, com o passo a passo n
    - `0005_servico_quantidade.sql` — quantidade e unidade no serviço do fechamento
    - `0006_orcamento.sql` — base de preços referenciais e complementos do orçamento
    - `0007_parametros_solar.sql` — parâmetros da cotação solar
+
+   Com o banco já no ar, migração nova não precisa ser colada na mão: o fluxo **Migrar banco**
+   aplica sozinha toda migração que chega ao repositório. A configuração, uma vez só, está em
+   [`supabase/BANCO-AUTOMATICO.md`](supabase/BANCO-AUTOMATICO.md).
 3. (Já incluída em `instalar.sql`.) Se aplicou as migrations uma a uma, ligue a trigger:
 
    ```sql
@@ -151,7 +155,10 @@ src/
 supabase/
   migrations/              esquema, RLS, seed, buckets e evoluções
   instalar.sql             os sete migrations num arquivo só, dentro de uma transação
+  BANCO-AUTOMATICO.md      como o banco passa a se atualizar sozinho a cada envio
   tests/                   teste SQL de permissões
+scripts/
+  migrar-banco.mjs         aplica as migrações pendentes; roda no GitHub Actions
 documentos/                peças de comunicação — guia de instalação e carta ao parceiro
 ```
 
