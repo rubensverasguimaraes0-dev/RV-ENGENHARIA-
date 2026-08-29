@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { evolucaoDaObra, resumirEquipe } from './painel-obra'
+import { evolucaoDaObra, resumirEquipe, resumoMensal } from './painel-obra'
 import type { Funcionario, LancamentoDiario, Pagamento, Quentinha, Semana } from './tipos'
 
 function func(id: string, nome: string, extra: Partial<Funcionario> = {}): Funcionario {
@@ -151,5 +151,72 @@ describe('evolucao da obra semana a semana', () => {
 
   it('obra sem semana devolve serie vazia', () => {
     expect(evolucaoDaObra({ semanas: [], lancamentos, quentinhas, pagamentos })).toEqual([])
+  })
+})
+
+
+describe('mes a mes — o que entrou, o que saiu e o que sobrou', () => {
+  const base = {
+    lancamentos: [lanc('f1', '2026-07-20', 200000), lanc('f1', '2026-08-03', 100000)],
+    quentinhas: [
+      { id: 'q1', obra_id: 'o1', semana_id: null, data: '2026-07-20', quantidade: 2, valor_unitario: 2200 },
+    ] as Quentinha[],
+    materiais: [{ data: '2026-08-10' as const, valor: 50000 }],
+    hoje: '2026-08-29' as const,
+  }
+  const pagamentos = [
+    parcela('p1', { valor_previsto: 500000, data_prevista: '2026-07-23', valor_recebido: 500000, data_recebimento: '2026-07-23' }),
+    parcela('p2', { valor_previsto: 500000, data_prevista: '2026-08-01', valor_recebido: 500000, data_recebimento: '2026-08-01' }),
+    parcela('p3', { valor_previsto: 500000, data_prevista: '2026-09-05' }),
+  ]
+  const meses = resumoMensal({ ...base, pagamentos })
+
+  it('agrupa por mes, em ordem, com o nome do mes escrito', () => {
+    expect(meses.map((m) => m.rotulo)).toEqual(['JULHO/2026', 'AGOSTO/2026', 'SETEMBRO/2026'])
+  })
+
+  it('sobrou = o que entrou menos o que saiu, no mes', () => {
+    // julho: 5.000,00 recebido − (2.000,00 diaria + 44,00 quentinha)
+    expect(meses[0]?.recebido).toBe(500000)
+    expect(meses[0]?.custo).toBe(204400)
+    expect(meses[0]?.sobrou).toBe(295600)
+  })
+
+  it('soma material junto do custo do mes', () => {
+    expect(meses[1]?.custo_materiais).toBe(50000)
+    expect(meses[1]?.custo).toBe(150000)
+  })
+
+  it('acumula o que sobrou de um mes para o outro', () => {
+    expect(meses[1]?.sobrou_acumulado).toBe(295600 + 350000)
+  })
+
+  it('mes que ainda nao chegou entra marcado como estimativa', () => {
+    expect(meses[2]?.futuro).toBe(true)
+    expect(meses[2]?.previsto).toBe(500000)
+    expect(meses[2]?.recebido).toBe(0)
+    expect(meses[0]?.futuro).toBe(false)
+  })
+
+  it('o mes corrente nao e futuro — o mes de hoje ainda esta acontecendo', () => {
+    expect(meses[1]?.chave).toBe('2026-08')
+    expect(meses[1]?.futuro).toBe(false)
+  })
+
+  it('desconta do recebido a parte que e de outro contrato', () => {
+    const m = resumoMensal({
+      ...base, lancamentos: [], quentinhas: [], materiais: [],
+      pagamentos: [parcela('p', { valor_recebido: 500000, valor_outro_contrato: 200000, data_recebimento: '2026-07-10' })],
+    })
+    expect(m[0]?.recebido).toBe(300000)
+  })
+
+  it('mes que so tem custo aparece com sobra negativa', () => {
+    const m = resumoMensal({ ...base, pagamentos: [], materiais: [] })
+    expect(m[0]?.sobrou).toBe(-204400)
+  })
+
+  it('obra sem nada devolve lista vazia', () => {
+    expect(resumoMensal({ pagamentos: [], lancamentos: [], quentinhas: [], materiais: [], hoje: '2026-08-29' })).toEqual([])
   })
 })

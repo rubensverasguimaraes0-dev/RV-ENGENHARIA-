@@ -8,7 +8,7 @@
  *
  * Fica no dominio, e nao na tela, porque sao contas sobre dinheiro.
  */
-import type { Centavos, DataISO } from '@/lib/format'
+import { nomeDoMes, type Centavos, type DataISO } from '@/lib/format'
 import { custoDoLancamento } from './fechamento-semanal'
 import type { Funcionario, LancamentoDiario, Pagamento, Quentinha, Semana } from './tipos'
 
@@ -144,4 +144,98 @@ export function evolucaoDaObra(entrada: {
       recebido_acumulado,
     }
   })
+}
+
+
+export interface MesDaObra {
+  /** aaaa-mm, para ordenar */
+  chave: string
+  /** AGOSTO/2026 */
+  rotulo: string
+  /** parcelas com vencimento no mes — o que era para entrar */
+  previsto: Centavos
+  /** o que entrou de fato, ja descontado o que e de outro contrato */
+  recebido: Centavos
+  custo_mao_obra: Centavos
+  custo_alimentacao: Centavos
+  custo_materiais: Centavos
+  custo: Centavos
+  /** recebido menos custo: o que sobrou no mes */
+  sobrou: Centavos
+  /** soma corrida do que sobrou, mes a mes */
+  sobrou_acumulado: Centavos
+  /** mes que ainda nao chegou: os valores sao estimativa, nao historico */
+  futuro: boolean
+}
+
+/**
+ * A obra mes a mes: o que era para entrar, o que entrou, o que saiu e o que
+ * sobrou.
+ *
+ * Meses futuros entram na lista, com o previsto das parcelas e custo zero. Nao
+ * e engano: e a estimativa do que ainda vem, e sem ela a tabela para no mes
+ * corrente e nao ajuda a planejar. O campo `futuro` marca esses meses para a
+ * tela dizer, com todas as letras, que ali e estimativa.
+ *
+ * "Sobrou" e caixa do mes, nao lucro: e o que entrou menos o que saiu naquele
+ * mes. Numa empreitada as parcelas nao acompanham o ritmo da obra, entao um mes
+ * pode sobrar muito e o seguinte faltar, sem que nada tenha mudado no negocio.
+ */
+export function resumoMensal(entrada: {
+  pagamentos: Pagamento[]
+  lancamentos: LancamentoDiario[]
+  quentinhas: Quentinha[]
+  /** notas e despesas: qualquer custo com data e valor */
+  materiais: { data: DataISO; valor: Centavos }[]
+  hoje: DataISO
+}): MesDaObra[] {
+  const meses = new Map<string, MesDaObra>()
+  const mesDeHoje = entrada.hoje.slice(0, 7)
+
+  const pegar = (data: DataISO): MesDaObra => {
+    const chave = data.slice(0, 7)
+    let mes = meses.get(chave)
+    if (!mes) {
+      mes = {
+        chave,
+        rotulo: nomeDoMes(data),
+        previsto: 0,
+        recebido: 0,
+        custo_mao_obra: 0,
+        custo_alimentacao: 0,
+        custo_materiais: 0,
+        custo: 0,
+        sobrou: 0,
+        sobrou_acumulado: 0,
+        futuro: chave > mesDeHoje,
+      }
+      meses.set(chave, mes)
+    }
+    return mes
+  }
+
+  for (const p of entrada.pagamentos) {
+    if (p.data_prevista) pegar(p.data_prevista).previsto += p.valor_previsto
+    if (p.data_recebimento && p.valor_recebido !== null) {
+      pegar(p.data_recebimento).recebido += p.valor_recebido - (p.valor_outro_contrato ?? 0)
+    }
+  }
+
+  for (const l of entrada.lancamentos) pegar(l.data).custo_mao_obra += custoDoLancamento(l)
+  for (const q of entrada.quentinhas) {
+    pegar(q.data).custo_alimentacao += q.quantidade * q.valor_unitario
+  }
+  for (const m of entrada.materiais) pegar(m.data).custo_materiais += m.valor
+
+  const lista = [...meses.values()].sort((a, b) => (a.chave < b.chave ? -1 : a.chave > b.chave ? 1 : 0))
+
+  let acumulado = 0
+  for (const m of lista) {
+    m.custo = m.custo_mao_obra + m.custo_alimentacao + m.custo_materiais
+    m.sobrou = m.recebido - m.custo
+    acumulado += m.sobrou
+    m.sobrou_acumulado = acumulado
+  }
+
+  return lista
 }

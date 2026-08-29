@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { FormularioAcao, Campo, Selecao, AreaTexto, Marcador } from '@/components/formulario'
 import { CapturaFoto } from '@/components/captura-foto'
 import { registrarRecebimento, salvarParcela } from './acoes'
-import { formatarMoeda, formatarValor, hojeISO, lerMoeda } from '@/lib/format'
+import { formatarData, formatarMoeda, formatarValor, hojeISO, lerMoeda } from '@/lib/format'
 
 const FORMAS = ['pix', 'espécie', 'transferência', 'cartão', 'boleto', 'cheque']
 
@@ -51,9 +51,11 @@ export function FormularioRecebimento({
     valor_previsto: number
     valor_recebido: number | null
     valor_outro_contrato: number
+    data_prevista: string | null
     data_recebimento: string | null
     forma_pagamento: string | null
     observacao: string | null
+    balao: boolean
   }
 }) {
   const [recebido, setRecebido] = useState(
@@ -64,11 +66,25 @@ export function FormularioRecebimento({
   )
 
   const liquido = (lerMoeda(recebido) ?? 0) - (lerMoeda(outro) ?? 0)
+  // Recebeu menos do que estava combinado: a diferenca precisa aparecer ANTES
+  // de salvar, senao vira surpresa no fechamento.
+  const diferenca = liquido - parcela.valor_previsto
 
   return (
     <FormularioAcao acao={registrarRecebimento} className="space-y-2" rotuloBotao="Registrar recebimento">
       <input type="hidden" name="obra_id" value={obraId} />
       <input type="hidden" name="id" value={parcela.id} />
+
+      <div className="rounded border border-slate-300 bg-rv-50 px-3 py-2 text-sm">
+        <div className="font-semibold text-rv-900">
+          Parcela {parcela.numero_parcela}
+          {parcela.balao && ' — saldo do contrato'}
+        </div>
+        <div className="text-slate-600 text-[13px]">
+          Combinado: <strong>{formatarMoeda(parcela.valor_previsto)}</strong>
+          {parcela.data_prevista && <> · vencimento {formatarData(parcela.data_prevista)}</>}
+        </div>
+      </div>
 
       <div className="grid gap-2 sm:grid-cols-2">
         <label className="block">
@@ -113,9 +129,18 @@ export function FormularioRecebimento({
         </span>
       </label>
 
-      <p className="text-sm font-medium text-rv-900">
-        Entra nesta obra: <strong>{formatarMoeda(liquido)}</strong>
-      </p>
+      <div className="rounded border border-slate-300 px-3 py-2">
+        <p className="text-sm font-medium text-rv-900">
+          Entra nesta obra: <strong>{formatarMoeda(liquido)}</strong>
+        </p>
+        {diferenca !== 0 && (
+          <p className={`text-[13px] mt-0.5 ${diferenca < 0 ? 'text-alerta-700' : 'text-ok-700'}`}>
+            {diferenca < 0
+              ? `${formatarMoeda(-diferenca)} a menos do que estava combinado para esta parcela.`
+              : `${formatarMoeda(diferenca)} a mais do que estava combinado para esta parcela.`}
+          </p>
+        )}
+      </div>
 
       <AreaTexto
         rotulo="Observação"
@@ -126,7 +151,7 @@ export function FormularioRecebimento({
       />
 
       <div>
-        <span className="rotulo">Comprovante</span>
+        <span className="rotulo">Comprovante do pagamento</span>
         <CapturaFoto
           bucket="comprovantes"
           obraId={obraId}
@@ -134,6 +159,10 @@ export function FormularioRecebimento({
           nomeCampo="comprovante"
           rotulo="Fotografar comprovante"
         />
+        <p className="mt-1 text-[11px] text-slate-500">
+          O comprovante anexado aqui sai numa página própria, ao final do cronograma em PDF que
+          vai para o cliente.
+        </p>
       </div>
     </FormularioAcao>
   )

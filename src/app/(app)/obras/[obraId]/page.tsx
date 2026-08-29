@@ -265,6 +265,62 @@ export default async function PainelDaObra({ params }: { params: Promise<{ obraI
         </Cartao>
       )}
 
+      {detalhe.meses.length > 0 && (
+        <Cartao titulo="Mês a mês: quanto entrou, quanto saiu, quanto sobrou" className="mt-3">
+          <div className="rolagem">
+            <table className="tabela">
+              <thead>
+                <tr>
+                  <th>Mês</th>
+                  <th className="num">Previsto</th>
+                  <th className="num">Recebido</th>
+                  <th className="num">Mão de obra</th>
+                  <th className="num">Alimentação</th>
+                  <th className="num">Materiais</th>
+                  <th className="num">Saiu no mês</th>
+                  <th className="num">Sobrou no mês</th>
+                  <th className="num">Sobra acumulada</th>
+                </tr>
+              </thead>
+              <tbody>
+                {detalhe.meses.map((m) => (
+                  <tr key={m.chave} className={m.futuro ? 'text-slate-500 italic' : ''}>
+                    <td className="whitespace-nowrap">
+                      {m.rotulo}
+                      {m.futuro && (
+                        <span className="ml-1 not-italic etiqueta etiqueta-neutra">a vencer</span>
+                      )}
+                    </td>
+                    <td className="num"><Moeda valor={m.previsto} /></td>
+                    <td className="num"><Moeda valor={m.recebido} /></td>
+                    <td className="num"><Moeda valor={m.custo_mao_obra} /></td>
+                    <td className="num"><Moeda valor={m.custo_alimentacao} /></td>
+                    <td className="num"><Moeda valor={m.custo_materiais} /></td>
+                    <td className="num">{formatarMoeda(m.custo)}</td>
+                    <td
+                      className={`num font-semibold ${
+                        m.futuro ? '' : m.sobrou >= 0 ? 'text-ok-700' : 'text-erro-700'
+                      }`}
+                    >
+                      {m.futuro ? '—' : formatarMoeda(m.sobrou)}
+                    </td>
+                    <td className="num">{m.futuro ? '—' : formatarMoeda(m.sobrou_acumulado)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-[11px] text-slate-500">
+            &ldquo;Sobrou&rdquo; é caixa do mês — o que entrou menos o que saiu — e não lucro da
+            obra. Numa empreitada as parcelas não acompanham o ritmo do trabalho: um mês pode
+            sobrar muito e o seguinte faltar, sem que nada tenha mudado no negócio. O lucro só
+            fecha no Resultado, com a obra encerrada. Mês marcado como{' '}
+            <em>a vencer</em> é estimativa: mostra a parcela combinada, ainda não recebida.
+            Materiais contam apenas o que a RV pagou; nota paga pelo cliente não sai do seu caixa.
+          </p>
+        </Cartao>
+      )}
+
       {detalhe.equipe.length > 0 && (
         <Cartao titulo={`Quem trabalhou nesta obra (${detalhe.equipe.length})`} className="mt-3">
           <div className="rolagem">

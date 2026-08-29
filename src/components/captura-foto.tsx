@@ -8,11 +8,22 @@ export interface FotoEnviada {
   caminho: string
   previa: string
   nome: string
+  pdf: boolean
 }
 
 /**
- * Captura direta pela camera do celular, com compressao antes do upload
- * (spec 2). Permite mais de uma foto por nota, para cupom longo.
+ * Anexo de comprovante e de nota, por dois caminhos.
+ *
+ * O botao da camera abre a camera; o de arquivo abre a galeria do celular ou a
+ * pasta do computador, e aceita PDF. Antes havia um botao so, com
+ * `capture="environment"`, e esse atributo faz o celular abrir a camera DIRETO,
+ * sem oferecer a galeria — quem estava viajando, com a nota guardada no
+ * carretel, nao tinha como anexar. Os dois caminhos existem porque os dois
+ * acontecem: a nota fotografada na hora, na obra, e a que chega depois por
+ * WhatsApp ou e-mail.
+ *
+ * A imagem e comprimida no aparelho antes de subir (spec 2). PDF sobe como
+ * esta: comprimir PDF no navegador estragaria o documento.
  *
  * O caminho segue a convencao <obra_id>/<pasta>/<arquivo>, que e o que as
  * policies do Storage usam para decidir o acesso por obra.
@@ -35,7 +46,8 @@ export function CapturaFoto({
   const [fotos, setFotos] = useState<FotoEnviada[]>([])
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
-  const entrada = useRef<HTMLInputElement>(null)
+  const entradaCamera = useRef<HTMLInputElement>(null)
+  const entradaArquivo = useRef<HTMLInputElement>(null)
 
   async function enviar(arquivos: FileList | null) {
     if (!arquivos || arquivos.length === 0) return
@@ -70,6 +82,7 @@ export function CapturaFoto({
           caminho,
           previa: URL.createObjectURL(comprimido),
           nome: arquivo.name,
+          pdf: arquivo.type === 'application/pdf',
         })
       }
 
@@ -80,7 +93,10 @@ export function CapturaFoto({
       setErro(e instanceof Error ? e.message : 'Falha ao enviar a foto.')
     } finally {
       setEnviando(false)
-      if (entrada.current) entrada.current.value = ''
+      // Limpa as duas: sem isso, escolher o mesmo arquivo de novo nao dispara
+      // o onChange e parece que o botao quebrou.
+      if (entradaCamera.current) entradaCamera.current.value = ''
+      if (entradaArquivo.current) entradaArquivo.current.value = ''
     }
   }
 
@@ -100,17 +116,27 @@ export function CapturaFoto({
       <div className="flex flex-wrap gap-2 mb-2">
         {fotos.map((f) => (
           <figure key={f.caminho} className="relative">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={f.previa}
-              alt={f.nome}
-              className="h-24 w-24 object-cover rounded border border-slate-300"
-            />
+            {f.pdf ? (
+              // PDF nao aparece dentro de <img>: mostraria um quadro quebrado.
+              <div className="h-24 w-24 rounded border border-slate-300 bg-rv-50 flex flex-col items-center justify-center gap-1 px-1">
+                <span className="text-rv-800 font-bold text-[11px]">PDF</span>
+                <span className="text-[9px] text-slate-600 text-center leading-tight break-all line-clamp-3">
+                  {f.nome}
+                </span>
+              </div>
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={f.previa}
+                alt={f.nome}
+                className="h-24 w-24 object-cover rounded border border-slate-300"
+              />
+            )}
             <button
               type="button"
               onClick={() => remover(f.caminho)}
               className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-erro-700 text-white text-xs font-bold"
-              aria-label="Remover foto"
+              aria-label={`Remover ${f.nome}`}
             >
               ×
             </button>
@@ -118,11 +144,21 @@ export function CapturaFoto({
         ))}
       </div>
 
+      {/* Camera: `capture` so aqui. */}
       <input
-        ref={entrada}
+        ref={entradaCamera}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        multiple
+        className="hidden"
+        onChange={(e) => enviar(e.target.files)}
+      />
+      {/* Galeria e arquivo: sem `capture`, senao o celular pula a galeria. */}
+      <input
+        ref={entradaArquivo}
         type="file"
         accept="image/*,application/pdf"
-        capture="environment"
         multiple
         className="hidden"
         onChange={(e) => enviar(e.target.files)}
@@ -133,20 +169,30 @@ export function CapturaFoto({
           type="button"
           className="botao botao-primario"
           disabled={enviando}
-          onClick={() => entrada.current?.click()}
+          onClick={() => entradaCamera.current?.click()}
         >
-          {enviando ? 'Enviando…' : fotos.length > 0 ? 'Adicionar outra foto' : rotulo}
+          {enviando ? 'Enviando…' : rotulo}
+        </button>
+        <button
+          type="button"
+          className="botao botao-neutro"
+          disabled={enviando}
+          onClick={() => entradaArquivo.current?.click()}
+        >
+          {enviando ? 'Enviando…' : 'Escolher da galeria ou arquivo'}
         </button>
         {fotos.length > 0 && (
           <span className="self-center text-xs text-ok-700 font-medium">
-            {fotos.length} foto(s) anexada(s)
+            {fotos.length} anexo(s)
           </span>
         )}
       </div>
 
       {erro && <p className="mt-2 text-sm text-erro-700">{erro}</p>}
       <p className="mt-1 text-[11px] text-slate-500">
-        A imagem é comprimida no celular antes de subir. Cupom longo: tire mais de uma foto.
+        Use a câmera quando estiver com o papel na mão. Use “escolher” para a foto que já está
+        no celular, para um PDF ou para um arquivo do computador. A imagem é comprimida antes de
+        subir; PDF sobe como está. Cupom longo: pode anexar mais de um.
       </p>
     </div>
   )
