@@ -5,6 +5,7 @@ import { carregarBaseDePrecos } from '@/lib/dados/cotacoes'
 import { carregarParametros, texto } from '@/lib/parametros'
 import { TituloPagina, Cartao } from '@/components/ui'
 import { FormularioExpresso } from './formulario'
+import { leituraConfigurada } from '@/lib/ia/claude'
 
 /**
  * Da conta do cliente a proposta pronta, numa tela so.
@@ -65,6 +66,7 @@ export default async function PaginaSolarExpresso() {
           <FormularioExpresso
             clientes={(clientesData ?? []) as { id: string; nome: string; telefone: string | null }[]}
             concessionariaPadrao={texto(parametros, 'solar_concessionaria_padrao', 'Equatorial Piauí')}
+            leituraDisponivel={leituraConfigurada()}
           />
         </Cartao>
 

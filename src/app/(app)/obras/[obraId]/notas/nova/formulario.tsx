@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useMesclaDaLeitura } from '@/components/mescla-leitura'
 import { useRouter } from 'next/navigation'
 import { FormularioAcao, Campo, Selecao, AreaTexto, Marcador } from '@/components/formulario'
 import { CapturaFoto } from '@/components/captura-foto'
@@ -8,21 +9,29 @@ import { salvarNota } from '../acoes'
 import { lerFotoDaNota } from './acoes-leitura'
 import { formatarValor, hojeISO } from '@/lib/format'
 
-/** Os campos que a leitura pela foto sabe preencher. */
-const PREENCHIVEIS = [
-  'data',
-  'valor',
-  'fornecedor_id',
-  'fornecedor_nome',
-  'numero_nota',
-  'categoria',
-  'descricao',
-  'forma_pagamento',
-  'pago_por',
-] as const
+/** Todo campo que vive dentro da secao que remonta com a leitura. */
+type Nome =
+  | 'data'
+  | 'valor'
+  | 'fornecedor_id'
+  | 'fornecedor_nome'
+  | 'numero_nota'
+  | 'categoria'
+  | 'descricao'
+  | 'forma_pagamento'
+  | 'pago_por'
 
-type Nome = (typeof PREENCHIVEIS)[number]
-type Valores = Record<Nome, string>
+const INICIAIS: Record<Nome, string> = {
+  data: hojeISO(),
+  valor: '',
+  fornecedor_id: '',
+  fornecedor_nome: '',
+  numero_nota: '',
+  categoria: 'material',
+  descricao: '',
+  forma_pagamento: '',
+  pago_por: 'rv',
+}
 
 export function FormularioNota({
   obraId,
@@ -39,47 +48,17 @@ export function FormularioNota({
 }) {
   const router = useRouter()
 
-  // O padrao de cada campo antes de qualquer coisa. Serve de regua: campo
-  // igual ao padrao = a pessoa nao mexeu; diferente = mexeu, e o que ela
-  // digitou vale mais do que qualquer leitura.
-  const [iniciais] = useState<Valores>(() => ({
-    data: hojeISO(),
-    valor: '',
-    fornecedor_id: '',
-    fornecedor_nome: '',
-    numero_nota: '',
-    categoria: 'material',
-    descricao: '',
-    forma_pagamento: '',
-    pago_por: 'rv',
-  }))
-  const [valores, setValores] = useState<Valores>(iniciais)
-  // Os campos sao nao-controlados; quando a leitura chega, esta chave troca e
-  // eles renascem com a MESCLA (digitado > lido > padrao) como novo padrao.
-  const [versao, setVersao] = useState(0)
+  // Campos nao-controlados: quando a leitura chega, a secao renasce com a
+  // mescla. Quem mexeu manda; o resto recebe o que veio da foto.
+  const { valores, versao, ancoraRef, aplicar } = useMesclaDaLeitura(INICIAIS)
 
   const [fotos, setFotos] = useState<string[]>([])
   const fotosRef = useRef<string[]>([])
-  const camposRef = useRef<HTMLDivElement>(null)
   const [lendo, setLendo] = useState(false)
   const [aviso, setAviso] = useState<{ tom: 'ok' | 'erro'; texto: string } | null>(null)
 
-  function valoresNaTela(): Valores {
-    const atuais = { ...iniciais }
-    for (const nome of PREENCHIVEIS) {
-      const campo = camposRef.current?.querySelector<HTMLInputElement | HTMLSelectElement>(
-        `[name="${nome}"]`,
-      )
-      if (campo) atuais[nome] = campo.value
-    }
-    return atuais
-  }
-
   async function preencherPelaFoto() {
     const assinatura = fotos.join('|')
-    // O que esta na tela AGORA, antes de qualquer coisa: e o que nao pode se
-    // perder — a revisao pegou a primeira versao apagando o que era digitado.
-    const digitados = valoresNaTela()
 
     setLendo(true)
     setAviso(null)
@@ -97,7 +76,7 @@ export function FormularioNota({
       }
 
       const l = r.leitura
-      const lidos: Partial<Record<Nome, string | null>> = {
+      aplicar({
         data: l.data,
         valor: l.valor !== null ? formatarValor(l.valor) : null,
         fornecedor_id: l.fornecedor_id,
@@ -107,17 +86,7 @@ export function FormularioNota({
         descricao: l.descricao,
         forma_pagamento: l.forma_pagamento,
         // pago_por a foto nao sabe: quem pagou e decisao de quem estava la.
-      }
-
-      const mesclados = { ...iniciais }
-      for (const nome of PREENCHIVEIS) {
-        mesclados[nome] =
-          digitados[nome] !== iniciais[nome]
-            ? digitados[nome] // a pessoa mexeu: o que ela pos fica
-            : (lidos[nome] ?? iniciais[nome])
-      }
-      setValores(mesclados)
-      setVersao((v) => v + 1)
+      })
       setAviso({ tom: 'ok', texto: r.resumo ?? 'Leitura aplicada. Confira antes de lançar.' })
     } catch {
       setAviso({ tom: 'erro', texto: 'A leitura automática falhou. Preencha à mão.' })
@@ -136,7 +105,7 @@ export function FormularioNota({
       <input type="hidden" name="obra_id" value={obraId} />
       <input type="hidden" name="id" value="" />
 
-      <div className="rounded border border-rv-600 bg-rv-50 p-3">
+      <div ref={ancoraRef} className="rounded border border-rv-600 bg-rv-50 p-3">
         <span className="rotulo">1. Foto da nota</span>
         <CapturaFoto
           bucket="notas-fiscais"
@@ -179,7 +148,7 @@ export function FormularioNota({
         )}
       </div>
 
-      <div key={versao} ref={camposRef} className="space-y-3">
+      <div key={versao} className="space-y-3">
         <div className="grid gap-2 sm:grid-cols-2">
           <Campo rotulo="Data" nome="data" tipo="date" valor={valores.data} obrigatorio />
           <Campo

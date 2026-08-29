@@ -121,3 +121,16 @@ describe('resumo da leitura', () => {
     expect(resumoDaLeitura(interpretarLeitura({}))).toContain('Não deu para ler')
   })
 })
+
+describe('ponto decimal com mais de duas casas', () => {
+  it('tarifa impressa com seis casas nao vira milhar', () => {
+    // "0.867459" virava R$ 8.674,59; parte inteira "0" nunca e milhar.
+    expect(interpretarLeitura({ valor: '0.867459' }).valor).toBe(87)
+    expect(interpretarLeitura({ valor: '0.895' }).valor).toBe(90)
+  })
+
+  it('grupo de milhar de verdade continua milhar', () => {
+    expect(interpretarLeitura({ valor: '1.234' }).valor).toBe(123400)
+    expect(interpretarLeitura({ valor: '12.345' }).valor).toBe(1234500)
+  })
+})

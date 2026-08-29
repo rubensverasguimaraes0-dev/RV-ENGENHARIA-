@@ -9,7 +9,8 @@
  * Nada daqui salva nada. A leitura so preenche o formulario; quem decide
  * continua sendo quem confere e aperta "Lancar nota".
  */
-import { ehDataISO, lerData, lerMoeda, type Centavos, type DataISO } from '@/lib/format'
+import { ehDataISO, lerData, type Centavos, type DataISO } from '@/lib/format'
+import { dinheiroDaLeitura, textoDaLeitura } from './leitura-comum'
 import type { CategoriaNota } from './tipos'
 
 export interface LeituraNota {
@@ -33,59 +34,6 @@ const CATEGORIAS: CategoriaNota[] = [
 ]
 
 const FORMAS = ['pix', 'dinheiro', 'cartão', 'transferência', 'boleto', 'prazo']
-
-// "não identificado" e parentes: a IA avisando que nao achou. Compara a
-// FRASE INTEIRA — comparar so o comeco derrubava fornecedor de verdade, como
-// "Semar Supermercado" ou "Sempre Forte Ferragens".
-const SENTINELAS =
-  /^(n[aã]o (identificad[oa]|informad[oa]|consta|leg[ií]vel|dispon[ií]vel)|sem (valor|nome|n[uú]mero|dados|informa[cç][aã]o)|ileg[ií]vel|desconhecid[oa]|indispon[ií]vel|n\/?[ad]|-+|\?+)$/i
-
-function texto(v: unknown): string | null {
-  if (typeof v !== 'string') return null
-  const limpo = v.trim()
-  if (!limpo || SENTINELAS.test(limpo)) return null
-  return limpo
-}
-
-/**
- * Dinheiro vindo da IA, que nao digita como brasileiro: pode vir "476,40",
- * "476.40", "1.234,56", "1,234.56" ou o numero 476.4.
- *
- * O lerMoeda sozinho nao serve aqui: ele foi escrito para digitacao pt-BR e
- * trata todo ponto como separador de milhar — "476.40" virava 47.640,00, cem
- * vezes a nota. A regra desta funcao: quando ha ponto E virgula, o decimal e o
- * que vem POR ULTIMO; ponto sozinho seguido de 1 ou 2 digitos no fim e
- * decimal; o resto segue o lerMoeda.
- */
-function dinheiro(v: unknown): Centavos | null {
-  if (typeof v === 'number') {
-    return Number.isFinite(v) && v > 0 ? Math.round(v * 100) : null
-  }
-  if (typeof v !== 'string') return null
-
-  const s = v.replace(/[R$\s]/gi, '')
-  if (!s) return null
-
-  let normalizado = s
-  const ultimoPonto = s.lastIndexOf('.')
-  const ultimaVirgula = s.lastIndexOf(',')
-
-  if (ultimoPonto >= 0 && ultimaVirgula >= 0) {
-    // Os dois presentes: o decimal e o que vem por ultimo.
-    normalizado =
-      ultimaVirgula > ultimoPonto
-        ? s // "1.234,56" — ja e pt-BR
-        : s.replace(/,/g, '') // "1,234.56" — tira o milhar e o ponto vira decimal abaixo
-  }
-  if (normalizado.includes('.') && !normalizado.includes(',')) {
-    const decimalComPonto = /^\d+\.\d{1,2}$/.test(normalizado)
-    // "476.40" e decimal (milhar tem sempre 3 digitos); "1.234" e milhar.
-    normalizado = decimalComPonto ? normalizado.replace('.', ',') : normalizado
-  }
-
-  const c = lerMoeda(normalizado)
-  return c !== null && c > 0 ? c : null
-}
 
 function dataDaNota(v: unknown): DataISO | null {
   if (typeof v !== 'string') return null
@@ -112,15 +60,15 @@ export function interpretarLeitura(bruto: unknown): LeituraNota {
   const forma = typeof b.forma_pagamento === 'string' ? b.forma_pagamento.toLowerCase().trim() : ''
 
   return {
-    fornecedor: texto(b.fornecedor),
-    cnpj: texto(b.cnpj),
-    numero_nota: texto(b.numero_nota),
+    fornecedor: textoDaLeitura(b.fornecedor),
+    cnpj: textoDaLeitura(b.cnpj),
+    numero_nota: textoDaLeitura(b.numero_nota),
     data: dataDaNota(b.data),
-    valor: dinheiro(b.valor),
+    valor: dinheiroDaLeitura(b.valor),
     categoria: (CATEGORIAS as string[]).includes(categoria)
       ? (categoria as CategoriaNota)
       : null,
-    descricao: texto(b.descricao),
+    descricao: textoDaLeitura(b.descricao),
     forma_pagamento: FORMAS.includes(forma) ? forma : null,
   }
 }
