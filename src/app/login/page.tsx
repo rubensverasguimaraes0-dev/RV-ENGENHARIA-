@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { FormularioLogin } from './formulario'
 import { Marca } from '@/components/marca'
 import { carregarIdentidade, logoDaEmpresa, texto } from '@/lib/parametros'
@@ -30,6 +31,11 @@ export default async function PaginaLogin({
           <div className="cartao-titulo">Entrar</div>
           <div className="p-4">
             <FormularioLogin proximo={proximo ?? '/'} />
+            <p className="mt-3 text-center text-sm">
+              <Link href="/esqueci-senha" className="acao acao-neutra">
+                Esqueci minha senha
+              </Link>
+            </p>
           </div>
         </div>
 

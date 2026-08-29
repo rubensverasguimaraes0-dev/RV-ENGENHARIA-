@@ -39,7 +39,17 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
-  const rotaPublica = pathname === '/login' || pathname === '/offline' || pathname === '/configurar'
+  // Quem perdeu a senha nao tem sessao — se estas rotas exigissem login, a
+  // recuperacao mandaria a pessoa justamente para a tela em que ela travou.
+  // /nova-senha fica publica e decide sozinha: com sessao troca a senha, sem
+  // sessao explica que o link expirou.
+  const rotaPublica =
+    pathname === '/login' ||
+    pathname === '/offline' ||
+    pathname === '/configurar' ||
+    pathname === '/esqueci-senha' ||
+    pathname === '/nova-senha' ||
+    pathname === '/auth/confirmar'
 
   if (!user && !rotaPublica) {
     const url = request.nextUrl.clone()

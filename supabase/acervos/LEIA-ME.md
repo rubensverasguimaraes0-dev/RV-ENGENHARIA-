@@ -5,6 +5,14 @@ uma vez só. É a ponte entre o controle antigo, feito em planilha, e o app: em 
 de redigitar semana por semana, cola-se o arquivo no SQL Editor do Supabase e a
 obra aparece completa, com equipe, semanas fechadas, presenças e alimentação.
 
+## O caminho curto
+
+`selecta-completa.sql` é os dois arquivos abaixo num só: **um copiar e um Run**,
+sem ordem para lembrar. É o que usar quando o banco ainda não tem a obra.
+
+Os dois arquivos separados continuam aqui porque servem para o caso de já haver
+uma parte carregada — o primeiro cria a obra, o segundo só o contrato.
+
 ## Como carregar
 
 1. Supabase → **SQL Editor** → **New query**

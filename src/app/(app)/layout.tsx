@@ -27,6 +27,9 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
                 {usuario.perfil === 'admin' ? 'Administrador' : 'Lançador'}
               </span>
             </span>
+            <Link href="/nova-senha" className="text-rv-100 underline underline-offset-2">
+              Trocar senha
+            </Link>
             <form action={sair}>
               <button className="text-rv-100 underline underline-offset-2" type="submit">
                 Sair
