@@ -180,6 +180,12 @@ export default async function PainelDaObra({ params }: { params: Promise<{ obraI
               <Link href={`/obras/${obraId}/pagamentos/relatorio`} className="botao botao-neutro">
                 Cronograma de pagamentos
               </Link>
+              <Link
+                href={`/obras/${obraId}/relatorio-final`}
+                className="botao botao-primario"
+              >
+                Relatório final (interno)
+              </Link>
             </div>
           </Cartao>
         </div>

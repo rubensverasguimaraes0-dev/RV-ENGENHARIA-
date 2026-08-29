@@ -8,6 +8,18 @@ export interface DetalheDaObra {
   equipe: LinhaDaEquipe[]
   evolucao: PontoDaEvolucao[]
   meses: MesDaObra[]
+  parcelas: Pagamento[]
+  /** o que a RV pagou a equipe, com o nome de cada um e a semana */
+  pagamentosEquipe: {
+    id: string
+    funcionario_id: string
+    nome: string
+    semana: number | null
+    valor: number
+    data_pagamento: string
+    forma_pagamento: string | null
+    tem_comprovante: boolean
+  }[]
 }
 
 /**
@@ -20,7 +32,8 @@ export interface DetalheDaObra {
 export async function carregarDetalheDaObra(obraId: string): Promise<DetalheDaObra> {
   const supabase = await criarClienteServidor()
 
-  const [lancamentos, funcionarios, quentinhas, semanas, pagamentos, notas, despesas] = await Promise.all([
+  const [lancamentos, funcionarios, quentinhas, semanas, pagamentos, notas, despesas, equipePaga] =
+    await Promise.all([
     supabase
       .from('lancamentos_diarios')
       .select('id, obra_id, semana_id, funcionario_id, data, tipo_diaria, valor_diaria, valor_vale, observacao')
@@ -58,6 +71,12 @@ export async function carregarDetalheDaObra(obraId: string): Promise<DetalheDaOb
       .select('data, valor')
       .eq('obra_id', obraId)
       .is('excluido_em', null),
+    supabase
+      .from('pagamentos_funcionario')
+      .select('id, funcionario_id, valor, data_pagamento, forma_pagamento, comprovante_url, semana:semanas (numero)')
+      .eq('obra_id', obraId)
+      .is('excluido_em', null)
+      .order('data_pagamento'),
   ])
 
   const semanasLidas = (semanas.data ?? []).map((s) => ({
@@ -74,7 +93,25 @@ export async function carregarDetalheDaObra(obraId: string): Promise<DetalheDaOb
     materiais: [...(notas.data ?? []), ...(despesas.data ?? [])] as { data: DataISO; valor: number }[],
   }
 
+  const nomes = new Map(
+    ((funcionarios.data ?? []) as { id: string; nome: string }[]).map((f) => [f.id, f.nome]),
+  )
+
   return {
+    parcelas: lidos.pagamentos,
+    pagamentosEquipe: (equipePaga.data ?? []).map((p) => {
+      const semana = p.semana as unknown as { numero: number } | null
+      return {
+        id: p.id as string,
+        funcionario_id: p.funcionario_id as string,
+        nome: nomes.get(p.funcionario_id as string) ?? 'Funcionário removido',
+        semana: semana?.numero ?? null,
+        valor: Number(p.valor ?? 0),
+        data_pagamento: p.data_pagamento as string,
+        forma_pagamento: (p.forma_pagamento as string) ?? null,
+        tem_comprovante: Boolean(p.comprovante_url),
+      }
+    }),
     meses: resumoMensal({ ...lidos, hoje: hojeISO() }),
     equipe: resumirEquipe(
       (lancamentos.data ?? []) as unknown as LancamentoDiario[],

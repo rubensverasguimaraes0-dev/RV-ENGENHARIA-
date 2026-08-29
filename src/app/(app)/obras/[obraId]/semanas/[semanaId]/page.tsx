@@ -55,6 +55,12 @@ export default async function PaginaFechamentoSemana({
             >
               Recibos
             </Link>
+            <Link
+              href={`/obras/${obraId}/semanas/${semanaId}/pagar`}
+              className="botao botao-primario"
+            >
+              Pagar a equipe
+            </Link>
           </>
         }
       />

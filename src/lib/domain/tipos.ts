@@ -53,6 +53,18 @@ export interface LancamentoDiario {
   observacao: string | null
 }
 
+export interface PagamentoFuncionario {
+  id: string
+  obra_id: string
+  semana_id: string | null
+  funcionario_id: string
+  valor: Centavos
+  data_pagamento: DataISO
+  forma_pagamento: string | null
+  comprovante_url: string | null
+  observacao: string | null
+}
+
 export interface Quentinha {
   id: string
   obra_id: string
