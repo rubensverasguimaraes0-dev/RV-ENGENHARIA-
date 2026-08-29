@@ -7,6 +7,7 @@ import { criarClienteServidor } from '@/lib/supabase/server'
 import { TituloPagina, Cartao, Indicador, Moeda, Etiqueta } from '@/components/ui'
 import { formatarData, formatarMoeda, formatarPercentual, hojeISO } from '@/lib/format'
 import { CORES, GraficoAcumulado, GraficoSemanas, Legenda } from '@/components/graficos'
+import { TabelaFicha } from '@/components/tabela-ficha'
 
 export default async function PainelDaObra({ params }: { params: Promise<{ obraId: string }> }) {
   const { obraId } = await params
@@ -238,84 +239,101 @@ export default async function PainelDaObra({ params }: { params: Promise<{ obraI
             </div>
           </div>
 
-          <div className="rolagem mt-3">
-            <table className="tabela">
-              <thead>
-                <tr>
-                  <th>Semana</th>
-                  <th>Período</th>
-                  <th className="num">Mão de obra</th>
-                  <th className="num">Alimentação</th>
-                  <th className="num">Custo da semana</th>
-                  <th className="num">Custo acumulado</th>
-                  <th className="num">Recebido acumulado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {detalhe.evolucao.map((e) => (
-                  <tr key={e.semana}>
-                    <td>{e.semana}</td>
-                    <td className="whitespace-nowrap">
-                      {formatarData(e.data_inicio)} a {formatarData(e.data_fim)}
-                    </td>
-                    <td className="num"><Moeda valor={e.mao_obra} /></td>
-                    <td className="num"><Moeda valor={e.alimentacao} /></td>
-                    <td className="num">{formatarMoeda(e.custo)}</td>
-                    <td className="num">{formatarMoeda(e.custo_acumulado)}</td>
-                    <td className="num">{formatarMoeda(e.recebido_acumulado)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="mt-3">
+            <TabelaFicha
+              itens={detalhe.evolucao}
+              chave={(e) => String(e.semana)}
+              colunas={[
+                {
+                  rotulo: 'Semana',
+                  celular: 'titulo',
+                  valor: (e) => (
+                    <>
+                      Semana {e.semana}
+                      <span className="block text-[12px] font-normal text-slate-500 lg:inline lg:ml-1">
+                        {formatarData(e.data_inicio)} a {formatarData(e.data_fim)}
+                      </span>
+                    </>
+                  ),
+                },
+                {
+                  rotulo: 'Custo da semana',
+                  celular: 'destaque',
+                  num: true,
+                  valor: (e) => formatarMoeda(e.custo),
+                },
+                { rotulo: 'Mão de obra', num: true, valor: (e) => formatarMoeda(e.mao_obra) },
+                { rotulo: 'Alimentação', num: true, valor: (e) => formatarMoeda(e.alimentacao) },
+                {
+                  rotulo: 'Custo acumulado',
+                  num: true,
+                  valor: (e) => formatarMoeda(e.custo_acumulado),
+                },
+                {
+                  rotulo: 'Recebido acumulado',
+                  num: true,
+                  valor: (e) => formatarMoeda(e.recebido_acumulado),
+                },
+              ]}
+            />
           </div>
         </Cartao>
       )}
 
       {detalhe.meses.length > 0 && (
         <Cartao titulo="Mês a mês: quanto entrou, quanto saiu, quanto sobrou" className="mt-3">
-          <div className="rolagem">
-            <table className="tabela">
-              <thead>
-                <tr>
-                  <th>Mês</th>
-                  <th className="num">Previsto</th>
-                  <th className="num">Recebido</th>
-                  <th className="num">Mão de obra</th>
-                  <th className="num">Alimentação</th>
-                  <th className="num">Materiais</th>
-                  <th className="num">Saiu no mês</th>
-                  <th className="num">Sobrou no mês</th>
-                  <th className="num">Sobra acumulada</th>
-                </tr>
-              </thead>
-              <tbody>
-                {detalhe.meses.map((m) => (
-                  <tr key={m.chave} className={m.futuro ? 'text-slate-500 italic' : ''}>
-                    <td className="whitespace-nowrap">
-                      {m.rotulo}
-                      {m.futuro && (
-                        <span className="ml-1 not-italic etiqueta etiqueta-neutra">a vencer</span>
-                      )}
-                    </td>
-                    <td className="num"><Moeda valor={m.previsto} /></td>
-                    <td className="num"><Moeda valor={m.recebido} /></td>
-                    <td className="num"><Moeda valor={m.custo_mao_obra} /></td>
-                    <td className="num"><Moeda valor={m.custo_alimentacao} /></td>
-                    <td className="num"><Moeda valor={m.custo_materiais} /></td>
-                    <td className="num">{formatarMoeda(m.custo)}</td>
-                    <td
-                      className={`num font-semibold ${
-                        m.futuro ? '' : m.sobrou >= 0 ? 'text-ok-700' : 'text-erro-700'
-                      }`}
-                    >
-                      {m.futuro ? '—' : formatarMoeda(m.sobrou)}
-                    </td>
-                    <td className="num">{m.futuro ? '—' : formatarMoeda(m.sobrou_acumulado)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <TabelaFicha
+            itens={detalhe.meses}
+            chave={(m) => m.chave}
+            classeDaLinha={(m) => (m.futuro ? 'text-slate-500 italic' : '')}
+            colunas={[
+              {
+                rotulo: 'Mês',
+                celular: 'titulo',
+                valor: (m) => (
+                  <>
+                    {m.rotulo}
+                    {m.futuro && (
+                      <span className="ml-1 not-italic etiqueta etiqueta-neutra">a vencer</span>
+                    )}
+                  </>
+                ),
+              },
+              {
+                rotulo: 'Sobrou',
+                celular: 'destaque',
+                num: true,
+                tom: (m) => (m.futuro ? 'neutro' : m.sobrou >= 0 ? 'ok' : 'erro'),
+                valor: (m) => (m.futuro ? '—' : formatarMoeda(m.sobrou)),
+              },
+              { rotulo: 'Previsto', num: true, valor: (m) => formatarMoeda(m.previsto) },
+              { rotulo: 'Recebido', num: true, valor: (m) => formatarMoeda(m.recebido) },
+              { rotulo: 'Saiu no mês', num: true, valor: (m) => formatarMoeda(m.custo) },
+              {
+                rotulo: 'Sobra acumulada',
+                num: true,
+                valor: (m) => (m.futuro ? '—' : formatarMoeda(m.sobrou_acumulado)),
+              },
+              {
+                rotulo: 'Mão de obra',
+                num: true,
+                celular: 'escondido',
+                valor: (m) => formatarMoeda(m.custo_mao_obra),
+              },
+              {
+                rotulo: 'Alimentação',
+                num: true,
+                celular: 'escondido',
+                valor: (m) => formatarMoeda(m.custo_alimentacao),
+              },
+              {
+                rotulo: 'Materiais',
+                num: true,
+                celular: 'escondido',
+                valor: (m) => formatarMoeda(m.custo_materiais),
+              },
+            ]}
+          />
           <p className="mt-2 text-[11px] text-slate-500">
             &ldquo;Sobrou&rdquo; é caixa do mês — o que entrou menos o que saiu — e não lucro da
             obra. Numa empreitada as parcelas não acompanham o ritmo do trabalho: um mês pode
@@ -329,59 +347,64 @@ export default async function PainelDaObra({ params }: { params: Promise<{ obraI
 
       {detalhe.equipe.length > 0 && (
         <Cartao titulo={`Quem trabalhou nesta obra (${detalhe.equipe.length})`} className="mt-3">
-          <div className="rolagem">
-            <table className="tabela">
-              <thead>
-                <tr>
-                  <th>Funcionário</th>
-                  <th>Função</th>
-                  <th className="num">Diárias</th>
-                  <th>Dias</th>
-                  <th>Período na obra</th>
-                  <th className="num">Total pago</th>
-                  <th className="w-[130px]">Peso no custo</th>
-                </tr>
-              </thead>
-              <tbody>
-                {detalhe.equipe.map((l) => (
-                  <tr key={l.funcionario_id}>
-                    <td className="font-medium">{l.nome}</td>
-                    <td>{l.funcao || '—'}</td>
-                    <td className="num">{l.diarias.toLocaleString('pt-BR')}</td>
-                    <td className="whitespace-nowrap text-[12px] text-slate-600">
-                      {l.dias_cheios} cheio(s)
-                      {l.dias_meios > 0 && ` · ${l.dias_meios} meio(s)`}
-                      {l.dias_sem_diaria > 0 && ` · ${l.dias_sem_diaria} sem diária`}
-                    </td>
-                    <td className="whitespace-nowrap text-[12px] text-slate-600">
-                      {formatarData(l.primeira)} a {formatarData(l.ultima)}
-                    </td>
-                    <td className="num">{formatarMoeda(l.total)}</td>
-                    <td>
-                      <div className="flex items-center gap-2">
-                        <div className="h-2 flex-1 rounded-sm bg-slate-200 overflow-hidden">
-                          <div
-                            className="h-full rounded-sm"
-                            style={{ width: `${l.fracao * 100}%`, background: CORES.vermelho }}
-                          />
-                        </div>
-                        <span className="text-[11px] tabular-nums text-slate-600 w-10 text-right">
-                          {formatarPercentual(l.fracao, 1)}
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                <tr className="total">
-                  <td colSpan={5}>Total de mão de obra</td>
-                  <td className="num">
-                    {formatarMoeda(detalhe.equipe.reduce((s, l) => s + l.total, 0))}
-                  </td>
-                  <td></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <TabelaFicha
+            itens={detalhe.equipe}
+            chave={(l) => l.funcionario_id}
+            rodape={
+              <tr className="total">
+                <td colSpan={5}>Total de mão de obra</td>
+                <td className="num">
+                  {formatarMoeda(detalhe.equipe.reduce((s, l) => s + l.total, 0))}
+                </td>
+                <td></td>
+              </tr>
+            }
+            colunas={[
+              {
+                rotulo: 'Funcionário',
+                celular: 'titulo',
+                valor: (l) => (
+                  <>
+                    <span className="font-medium">{l.nome}</span>
+                    <span className="block text-[12px] font-normal text-slate-500 lg:hidden">
+                      {l.funcao || '—'}
+                    </span>
+                  </>
+                ),
+              },
+              {
+                rotulo: 'Total pago',
+                celular: 'destaque',
+                num: true,
+                valor: (l) => formatarMoeda(l.total),
+              },
+              { rotulo: 'Função', celular: 'escondido', valor: (l) => l.funcao || '—' },
+              { rotulo: 'Diárias', num: true, valor: (l) => l.diarias.toLocaleString('pt-BR') },
+              {
+                rotulo: 'Peso no custo',
+                num: true,
+                valor: (l) => formatarPercentual(l.fracao, 1),
+              },
+              {
+                rotulo: 'Dias',
+                valor: (l) => (
+                  <span className="whitespace-nowrap text-[12px] text-slate-600">
+                    {l.dias_cheios} cheio(s)
+                    {l.dias_meios > 0 && ` · ${l.dias_meios} meio(s)`}
+                    {l.dias_sem_diaria > 0 && ` · ${l.dias_sem_diaria} sem diária`}
+                  </span>
+                ),
+              },
+              {
+                rotulo: 'Período na obra',
+                valor: (l) => (
+                  <span className="whitespace-nowrap text-[12px] text-slate-600">
+                    {formatarData(l.primeira)} a {formatarData(l.ultima)}
+                  </span>
+                ),
+              },
+            ]}
+          />
         </Cartao>
       )}
 
