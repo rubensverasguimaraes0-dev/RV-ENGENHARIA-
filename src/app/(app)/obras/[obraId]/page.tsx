@@ -2,9 +2,11 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { exigirUsuario } from '@/lib/supabase/sessao'
 import { carregarObra, carregarPainelObra, listarObrasVisiveis } from '@/lib/dados/obra'
+import { carregarDetalheDaObra } from '@/lib/dados/painel-detalhe'
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { TituloPagina, Cartao, Indicador, Moeda, Etiqueta } from '@/components/ui'
 import { formatarData, formatarMoeda, formatarPercentual, hojeISO } from '@/lib/format'
+import { CORES, GraficoAcumulado, GraficoSemanas, Legenda } from '@/components/graficos'
 
 export default async function PainelDaObra({ params }: { params: Promise<{ obraId: string }> }) {
   const { obraId } = await params
@@ -21,7 +23,10 @@ export default async function PainelDaObra({ params }: { params: Promise<{ obraI
   const obra = await carregarObra(obraId)
   if (!obra) notFound()
 
-  const painel = await carregarPainelObra(obra)
+  const [painel, detalhe] = await Promise.all([
+    carregarPainelObra(obra),
+    carregarDetalheDaObra(obraId),
+  ])
   const supabase = await criarClienteServidor()
   const { count: notasSemFoto } = await supabase
     .from('notas_fiscais')
@@ -179,6 +184,144 @@ export default async function PainelDaObra({ params }: { params: Promise<{ obraI
           </Cartao>
         </div>
       </div>
+
+      {detalhe.evolucao.length > 0 && (
+        <Cartao titulo="Como a obra andou, semana a semana" className="mt-3">
+          <div className="grid gap-4 xl:grid-cols-2">
+            <div className="min-w-0">
+              <h3 className="text-[13px] font-semibold text-rv-900 mb-1">Custo de cada semana</h3>
+              <Legenda
+                itens={[
+                  { nome: 'Mão de obra', cor: CORES.vermelho },
+                  { nome: 'Alimentação', cor: CORES.ambar },
+                ]}
+              />
+              <GraficoSemanas
+                pontos={detalhe.evolucao.map((e) => ({
+                  rotulo: `S${e.semana}`,
+                  detalhe: `Semana ${e.semana}, de ${formatarData(e.data_inicio)} a ${formatarData(e.data_fim)}`,
+                  partes: [
+                    { nome: 'Mão de obra', valor: e.mao_obra, cor: CORES.vermelho },
+                    { nome: 'Alimentação', valor: e.alimentacao, cor: CORES.ambar },
+                  ],
+                }))}
+              />
+            </div>
+
+            <div className="min-w-0">
+              <h3 className="text-[13px] font-semibold text-rv-900 mb-1">
+                Acumulado: o que entrou e o que saiu
+              </h3>
+              <Legenda
+                itens={[
+                  { nome: 'Custo acumulado', cor: CORES.vermelho },
+                  { nome: 'Recebido acumulado', cor: CORES.azul },
+                ]}
+              />
+              <GraficoAcumulado
+                series={[
+                  { nome: 'Custo', cor: CORES.vermelho },
+                  { nome: 'Recebido', cor: CORES.azul },
+                ]}
+                pontos={detalhe.evolucao.map((e) => ({
+                  rotulo: `S${e.semana}`,
+                  detalhe: `Até ${formatarData(e.data_fim)}`,
+                  valores: [e.custo_acumulado, e.recebido_acumulado],
+                }))}
+              />
+            </div>
+          </div>
+
+          <div className="rolagem mt-3">
+            <table className="tabela">
+              <thead>
+                <tr>
+                  <th>Semana</th>
+                  <th>Período</th>
+                  <th className="num">Mão de obra</th>
+                  <th className="num">Alimentação</th>
+                  <th className="num">Custo da semana</th>
+                  <th className="num">Custo acumulado</th>
+                  <th className="num">Recebido acumulado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {detalhe.evolucao.map((e) => (
+                  <tr key={e.semana}>
+                    <td>{e.semana}</td>
+                    <td className="whitespace-nowrap">
+                      {formatarData(e.data_inicio)} a {formatarData(e.data_fim)}
+                    </td>
+                    <td className="num"><Moeda valor={e.mao_obra} /></td>
+                    <td className="num"><Moeda valor={e.alimentacao} /></td>
+                    <td className="num">{formatarMoeda(e.custo)}</td>
+                    <td className="num">{formatarMoeda(e.custo_acumulado)}</td>
+                    <td className="num">{formatarMoeda(e.recebido_acumulado)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Cartao>
+      )}
+
+      {detalhe.equipe.length > 0 && (
+        <Cartao titulo={`Quem trabalhou nesta obra (${detalhe.equipe.length})`} className="mt-3">
+          <div className="rolagem">
+            <table className="tabela">
+              <thead>
+                <tr>
+                  <th>Funcionário</th>
+                  <th>Função</th>
+                  <th className="num">Diárias</th>
+                  <th>Dias</th>
+                  <th>Período na obra</th>
+                  <th className="num">Total pago</th>
+                  <th className="w-[130px]">Peso no custo</th>
+                </tr>
+              </thead>
+              <tbody>
+                {detalhe.equipe.map((l) => (
+                  <tr key={l.funcionario_id}>
+                    <td className="font-medium">{l.nome}</td>
+                    <td>{l.funcao || '—'}</td>
+                    <td className="num">{l.diarias.toLocaleString('pt-BR')}</td>
+                    <td className="whitespace-nowrap text-[12px] text-slate-600">
+                      {l.dias_cheios} cheio(s)
+                      {l.dias_meios > 0 && ` · ${l.dias_meios} meio(s)`}
+                      {l.dias_sem_diaria > 0 && ` · ${l.dias_sem_diaria} sem diária`}
+                    </td>
+                    <td className="whitespace-nowrap text-[12px] text-slate-600">
+                      {formatarData(l.primeira)} a {formatarData(l.ultima)}
+                    </td>
+                    <td className="num">{formatarMoeda(l.total)}</td>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 flex-1 rounded-sm bg-slate-200 overflow-hidden">
+                          <div
+                            className="h-full rounded-sm"
+                            style={{ width: `${l.fracao * 100}%`, background: CORES.vermelho }}
+                          />
+                        </div>
+                        <span className="text-[11px] tabular-nums text-slate-600 w-10 text-right">
+                          {formatarPercentual(l.fracao, 1)}
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                <tr className="total">
+                  <td colSpan={5}>Total de mão de obra</td>
+                  <td className="num">
+                    {formatarMoeda(detalhe.equipe.reduce((s, l) => s + l.total, 0))}
+                  </td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </Cartao>
+      )}
 
       <p className="mt-3 text-[11px] text-slate-500">
         Painel interno em {formatarData(hojeISO())} — os valores desta tela nunca saem em documento

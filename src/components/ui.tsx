@@ -25,13 +25,15 @@ export function Cartao({
   titulo,
   children,
   acoes,
+  className = '',
 }: {
   titulo: string
   children: React.ReactNode
   acoes?: React.ReactNode
+  className?: string
 }) {
   return (
-    <section className="cartao overflow-hidden">
+    <section className={`cartao overflow-hidden ${className}`}>
       <div className="cartao-titulo flex items-center justify-between gap-2">
         <span>{titulo}</span>
         {acoes}
