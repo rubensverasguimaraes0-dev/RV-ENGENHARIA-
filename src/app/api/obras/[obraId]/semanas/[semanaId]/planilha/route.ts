@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { usuarioAtual } from '@/lib/supabase/sessao'
 import { carregarObra } from '@/lib/dados/obra'
-import { carregarFechamento } from '@/lib/dados/semana'
+import { carregarAcumuladoDaObra, carregarFechamento } from '@/lib/dados/semana'
 import { carregarParametros, dadosEmpresa } from '@/lib/parametros'
 import { gerarPlanilhaSemanal } from '@/lib/docs/planilha-semanal'
 import { nomeDeArquivo } from '@/lib/docs/estilo-planilha'
@@ -16,10 +16,11 @@ export async function GET(
   if (usuario.perfil !== 'admin') return new NextResponse('Sem permissão', { status: 403 })
 
   const { obraId, semanaId } = await params
-  const [obra, fechamento, parametros] = await Promise.all([
+  const [obra, fechamento, parametros, acumulado] = await Promise.all([
     carregarObra(obraId),
     carregarFechamento(obraId, semanaId),
     carregarParametros(),
+    carregarAcumuladoDaObra(obraId),
   ])
 
   if (!obra || !fechamento) return new NextResponse('Semana não encontrada', { status: 404 })
@@ -29,6 +30,7 @@ export async function GET(
     empresa: dadosEmpresa(parametros),
     obraNome: obra.nome,
     clienteNome: (obra.pagador ?? obra.cliente)?.nome ?? '',
+    acumulado,
   })
 
   const arquivo = nomeDeArquivo(`semana-${fechamento.semana.numero}-${obra.nome}`)

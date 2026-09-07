@@ -53,6 +53,18 @@ const funcionarios: Funcionario[] = [
     data_entrada: null,
     data_saida: null,
   },
+  {
+    id: 'f3',
+    nome: 'Carlos',
+    tipo: 'funcionario',
+    funcao: 'ajudante',
+    valor_diaria: 10000,
+    telefone: null,
+    chave_pix: null,
+    status: 'ativo',
+    data_entrada: null,
+    data_saida: null,
+  },
 ]
 
 const dias = ['2026-08-03', '2026-08-04', '2026-08-05', '2026-08-06', '2026-08-07']
@@ -82,6 +94,19 @@ const lancamentos: LancamentoDiario[] = dias.flatMap((data) => [
   },
 ])
 
+// So na segunda — nos outros dias ele tem de sair com traco.
+lancamentos.push({
+  id: 'l-carlos',
+  obra_id: 'o1',
+  semana_id: 's1',
+  funcionario_id: 'f3',
+  data: '2026-08-03',
+  tipo_diaria: 'meia',
+  valor_diaria: 5000,
+  valor_vale: 0,
+  observacao: 'entrou depois do almoço',
+})
+
 const quentinhas: Quentinha[] = [
   { id: 'q1', obra_id: 'o1', semana_id: 's1', data: '2026-08-03', quantidade: 2, valor_unitario: 1500 },
   { id: 'q2', obra_id: 'o1', semana_id: 's1', data: '2026-08-04', quantidade: 2, valor_unitario: 1500 },
@@ -105,19 +130,111 @@ async function abrirPlanilha() {
 }
 
 describe('planilha do fechamento semanal', () => {
-  it('gera uma aba por dia trabalhado mais o resumo', async () => {
+  it('sai com Parâmetros, uma aba por dia e o Resumo Semanal', async () => {
     const wb = await abrirPlanilha()
     const nomes = wb.worksheets.map((w) => w.name)
     // sabado 08/08 esta marcado como sem expediente: nao vira aba
-    expect(nomes).toHaveLength(6)
-    expect(nomes[5]).toBe('Resumo da semana')
-    expect(nomes[0]).toContain('Segunda')
+    expect(nomes).toHaveLength(7)
+    expect(nomes[0]).toBe('Parâmetros')
+    expect(nomes[1]).toContain('Segunda')
+    expect(nomes[6]).toBe('Resumo Semanal')
     expect(nomes.some((x) => x.includes('Sabado'))).toBe(false)
   })
 
-  it('escreve os totais como formula, nunca como numero digitado', async () => {
+  it('usa o formato de moeda brasileiro, e não o americano', async () => {
     const wb = await abrirPlanilha()
-    const resumo = wb.getWorksheet('Resumo da semana')!
+    const formatos = new Set<string>()
+    for (const ws of wb.worksheets) {
+      ws.eachRow((row) =>
+        row.eachCell((cell) => {
+          if (cell.numFmt?.includes('R$')) formatos.add(cell.numFmt)
+        }),
+      )
+    }
+    expect(formatos.size).toBeGreaterThan(0)
+    // Sem o prefixo [$-416] o conversor para PDF escreve "R$ 67,029.64".
+    for (const f of formatos) expect(f.startsWith('[$-416]')).toBe(true)
+  })
+
+  it('escreve tudo em Arial e desliga as linhas de grade', async () => {
+    const wb = await abrirPlanilha()
+    for (const ws of wb.worksheets) {
+      expect(ws.views[0]?.showGridLines).toBe(false)
+      ws.eachRow((row) =>
+        row.eachCell((cell) => {
+          if (cell.value !== null) expect(cell.font?.name).toBe('Arial')
+        }),
+      )
+    }
+  })
+
+  it('a aba do dia lista toda a equipe da semana, com traço em quem faltou', async () => {
+    const wb = await abrirPlanilha()
+    const terca = wb.getWorksheet('Terca 04-08') ?? wb.worksheets[2]!
+
+    const porNome = new Map<string, ExcelJS.Row>()
+    terca.eachRow((row) => {
+      const nome = row.getCell(1).value
+      if (typeof nome === 'string') porNome.set(nome, row)
+    })
+
+    // Antonio trabalhou: presenca 1 e valor do dia preenchidos.
+    expect(porNome.get('Antonio')!.getCell(4).value).toBe(1)
+    expect(porNome.get('Antonio')!.getCell(5).value).toBe(180)
+    // Carlos so trabalhou na segunda: aparece na lista, sem presenca nem valor.
+    expect(porNome.has('Carlos')).toBe(true)
+    expect(porNome.get('Carlos')!.getCell(4).value).toBeNull()
+    expect(porNome.get('Carlos')!.getCell(5).value).toBeNull()
+    // ...mas a diaria de cadastro continua a vista
+    expect(porNome.get('Carlos')!.getCell(3).value).toBe(100)
+  })
+
+  it('a meia diária aparece como 0,5 na coluna de presença', async () => {
+    const wb = await abrirPlanilha()
+    const segunda = wb.worksheets[1]!
+    let carlos: ExcelJS.Row | undefined
+    segunda.eachRow((row) => {
+      if (row.getCell(1).value === 'Carlos') carlos = row
+    })
+    expect(carlos!.getCell(4).value).toBe(0.5)
+    expect(carlos!.getCell(5).value).toBe(50)
+  })
+
+  it('traz as três seções numeradas na aba do dia', async () => {
+    const wb = await abrirPlanilha()
+    const segunda = wb.worksheets[1]!
+    const titulos: string[] = []
+    segunda.eachRow((row) => {
+      const v = row.getCell(1).value
+      if (typeof v === 'string' && /^\d\./.test(v)) titulos.push(v)
+    })
+    expect(titulos).toEqual([
+      '1. MÃO DE OBRA — DETALHAMENTO POR FUNCIONÁRIO',
+      '2. ALIMENTAÇÃO — QUENTINHAS DO DIA',
+      '3. RESUMO DO DIA',
+    ])
+  })
+
+  it('traz os cinco blocos numerados no resumo da semana', async () => {
+    const wb = await abrirPlanilha()
+    const resumo = wb.getWorksheet('Resumo Semanal')!
+    const titulos: string[] = []
+    resumo.eachRow((row) => {
+      const v = row.getCell(1).value
+      if (typeof v === 'string' && /^\d\./.test(v)) titulos.push(v)
+    })
+    expect(titulos).toEqual([
+      '1. FECHAMENTO POR DIA',
+      '2. GASTOS POR FUNCIONÁRIO',
+      '3. GASTOS COM QUENTINHAS — SEPARADO POR VALOR UNITÁRIO',
+      '4. GASTO GERAL DA SEMANA',
+      '5. ACUMULADO DA OBRA',
+    ])
+  })
+
+  it('escreve os totais como fórmula, nunca como número digitado', async () => {
+    const wb = await abrirPlanilha()
+    const resumo = wb.getWorksheet('Resumo Semanal')!
 
     const formulas: string[] = []
     resumo.eachRow((row) =>
@@ -129,27 +246,15 @@ describe('planilha do fechamento semanal', () => {
     )
 
     expect(formulas.some((f) => f.startsWith('SUM('))).toBe(true)
-    // liquido de cada funcionario = diarias - vales
-    expect(formulas).toContain('D7-E7')
-    // custo da semana = mao de obra + quentinhas, somando duas celulas de total
-    expect(formulas.some((f) => /^B\d+\+B\d+$/.test(f))).toBe(true)
+    // custo da quentinha = valor unitario x quantidade
+    expect(formulas.some((f) => /^A\d+\*B\d+$/.test(f))).toBe(true)
+    // gasto geral = total de mao de obra + total de alimentacao
+    expect(formulas.some((f) => /^F\d+\+C\d+$/.test(f))).toBe(true)
   })
 
-  it('leva os valores em reais, com formato de moeda', async () => {
+  it('separa as faixas de quentinha no resumo', async () => {
     const wb = await abrirPlanilha()
-    const resumo = wb.getWorksheet('Resumo da semana')!
-    // linha 1 titulo, 2 subtitulo, 4 faixa de secao, 5 cabecalho, 6 primeiro funcionario
-    const linha = resumo.getRow(6)
-    expect(linha.getCell(1).value).toBe('Antonio')
-    expect(linha.getCell(3).value).toBe(5)
-    expect(linha.getCell(4).value).toBe(900)
-    expect(linha.getCell(4).numFmt).toBe('R$ #,##0.00')
-    expect(linha.getCell(5).value).toBe(50)
-  })
-
-  it('separa as faixas de quentinha na aba de resumo', async () => {
-    const wb = await abrirPlanilha()
-    const resumo = wb.getWorksheet('Resumo da semana')!
+    const resumo = wb.getWorksheet('Resumo Semanal')!
 
     const valoresUnitarios: number[] = []
     resumo.eachRow((row) => {
@@ -160,9 +265,34 @@ describe('planilha do fechamento semanal', () => {
     expect(valoresUnitarios).toEqual([15, 18])
   })
 
-  it('registra os dias sem expediente na aba de resumo', async () => {
+  it('usa o acumulado da obra quando ele é informado', async () => {
+    const buffer = await gerarPlanilhaSemanal({
+      fechamento,
+      empresa: EMPRESA,
+      obraNome: 'Reforma Center Paes',
+      clienteNome: 'Center Paes',
+      acumulado: [
+        { numero: 1, data_inicio: '2026-07-20', data_fim: '2026-07-25',
+          diarias: 16, mao_obra: 234000, qtd_quentinhas: 12, alimentacao: 26400, total: 260400 },
+        { numero: 2, data_inicio: '2026-07-27', data_fim: '2026-07-31',
+          diarias: 19, mao_obra: 237000, qtd_quentinhas: 19, alimentacao: 33400, total: 270400 },
+      ],
+    })
+    const wb = new ExcelJS.Workbook()
+    await wb.xlsx.load(buffer as unknown as ArrayBuffer)
+    const resumo = wb.getWorksheet('Resumo Semanal')!
+
+    const semanas: string[] = []
+    resumo.eachRow((row) => {
+      const v = row.getCell(1).value
+      if (typeof v === 'string' && /^Semana \d+$/.test(v)) semanas.push(v)
+    })
+    expect(semanas).toEqual(['Semana 1', 'Semana 2'])
+  })
+
+  it('registra os dias sem expediente na nota do resumo', async () => {
     const wb = await abrirPlanilha()
-    const resumo = wb.getWorksheet('Resumo da semana')!
+    const resumo = wb.getWorksheet('Resumo Semanal')!
     let achou = false
     resumo.eachRow((row) => {
       const v = row.getCell(1).value
@@ -174,21 +304,17 @@ describe('planilha do fechamento semanal', () => {
     expect(achou).toBe(true)
   })
 
-  it('a aba do dia soma presença e quentinhas do próprio dia', async () => {
+  it('leva a observação do dia em vermelho', async () => {
     const wb = await abrirPlanilha()
-    const segunda = wb.worksheets[0]!
-    const formulas: string[] = []
-    segunda.eachRow((row) =>
-      row.eachCell((cell) => {
-        if (cell.type === ExcelJS.ValueType.Formula) {
-          formulas.push((cell.value as ExcelJS.CellFormulaValue).formula)
-        }
-      }),
-    )
-    // custo da quentinha = valor unitario x quantidade
-    expect(formulas.some((f) => /^A\d+\*B\d+$/.test(f))).toBe(true)
-    // total do dia = total de mao de obra + total de quentinhas
-    expect(formulas.some((f) => /^D\d+\+C\d+$/.test(f))).toBe(true)
+    const segunda = wb.worksheets[1]!
+    let obs: ExcelJS.Cell | undefined
+    segunda.eachRow((row) => {
+      const v = row.getCell(1).value
+      if (typeof v === 'string' && v.startsWith('Observação:')) obs = row.getCell(1)
+    })
+    expect(obs!.value).toContain('entrou depois do almoço')
+    expect(obs!.font?.color?.argb).toBe('FFC00000')
+    expect(obs!.font?.italic).toBe(true)
   })
 })
 

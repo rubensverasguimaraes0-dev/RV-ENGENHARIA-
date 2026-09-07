@@ -24,7 +24,12 @@ export interface LinhaDia {
   funcao: string
   tipo: 'funcionario' | 'parceiro'
   tipo_diaria: TipoDiaria
+  /** Diaria cheia do cadastro — a coluna "Diária (R$)" do relatorio. */
+  valor_diaria_padrao: Centavos
+  /** Valor efetivamente aplicado no dia (ja com a meia diaria descontada). */
   valor_diaria: Centavos
+  /** 1, 0,5 ou 0 — a coluna "Presença" do relatorio. */
+  fator_presenca: number
   valor_vale: Centavos
   observacao: string | null
 }
@@ -45,6 +50,8 @@ export interface AbaDia {
   total_quentinhas: Centavos
   total_vales: Centavos
   qtd_presentes: number
+  /** Soma dos fatores de presenca: 1 por diaria cheia, 0,5 por meia. */
+  diarias: number
   qtd_quentinhas: number
   total_dia: Centavos
 }
@@ -61,6 +68,9 @@ export interface ResumoFuncionario {
   funcao: string
   tipo: 'funcionario' | 'parceiro'
   chave_pix: string | null
+  valor_diaria_padrao: Centavos
+  /** dias_cheios + 0,5 x dias_meios. Dia sem diaria nao conta. */
+  diarias: number
   dias_cheios: number
   dias_meios: number
   dias_sem_diaria: number
@@ -76,12 +86,21 @@ export interface FechamentoSemanal {
   funcionarios: ResumoFuncionario[]
   faixas_quentinha: FaixaQuentinha[]
   total_mao_obra: Centavos
+  /** Diarias da semana: 1 por cheia, 0,5 por meia. */
+  diarias: number
   total_quentinhas: Centavos
   qtd_quentinhas: number
   total_vales: Centavos
   total_liquido: Centavos
   /** Mao de obra + quentinhas: o custo da semana para a obra. */
   custo_semana: Centavos
+}
+
+/** Quanto o dia vale na contagem de diarias: cheia 1, meia 0,5, sem diaria 0. */
+export function fatorDePresenca(tipo: TipoDiaria): number {
+  if (tipo === 'cheia') return 1
+  if (tipo === 'meia') return 0.5
+  return 0
 }
 
 /** Custo de mao de obra de um lancamento — 'sem_diaria' nao custa nada. */
@@ -122,7 +141,9 @@ export function calcularFechamentoSemanal(input: {
           funcao: f?.funcao ?? '',
           tipo: f?.tipo ?? 'funcionario',
           tipo_diaria: l.tipo_diaria,
+          valor_diaria_padrao: f?.valor_diaria ?? 0,
           valor_diaria: custoDoLancamento(l),
+          fator_presenca: fatorDePresenca(l.tipo_diaria),
           valor_vale: l.valor_vale,
           observacao: l.observacao,
         }
@@ -146,6 +167,7 @@ export function calcularFechamentoSemanal(input: {
       total_quentinhas,
       total_vales,
       qtd_presentes: linhas.length,
+      diarias: linhas.reduce((s, l) => s + l.fator_presenca, 0),
       qtd_quentinhas: quentinhasAgrupadas.reduce((s, q) => s + q.quantidade, 0),
       total_dia: total_mao_obra + total_quentinhas,
     }
@@ -169,6 +191,8 @@ export function calcularFechamentoSemanal(input: {
         funcao: f?.funcao ?? '',
         tipo: f?.tipo ?? ('funcionario' as const),
         chave_pix: f?.chave_pix ?? null,
+        valor_diaria_padrao: f?.valor_diaria ?? 0,
+        diarias: dias_cheios + dias_meios * 0.5,
         dias_cheios,
         dias_meios,
         dias_sem_diaria,
@@ -191,6 +215,7 @@ export function calcularFechamentoSemanal(input: {
     funcionarios: resumo,
     faixas_quentinha: faixas,
     total_mao_obra,
+    diarias: resumo.reduce((s, r) => s + r.diarias, 0),
     total_quentinhas,
     qtd_quentinhas: faixas.reduce((s, f) => s + f.quantidade, 0),
     total_vales,
