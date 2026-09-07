@@ -18,6 +18,7 @@ const ABAS = [
   { sufixo: '/fechamento', rotulo: 'Fechamento', soAdmin: true },
   { sufixo: '/orcamentos', rotulo: 'Orçamentos', soAdmin: true },
   { sufixo: '/arquivos', rotulo: 'Arquivos', soAdmin: true },
+  { sufixo: '/mao-de-obra', rotulo: 'Mão de obra', soAdmin: true },
   { sufixo: '/resultado', rotulo: 'Resultado', soAdmin: true },
 ]
 

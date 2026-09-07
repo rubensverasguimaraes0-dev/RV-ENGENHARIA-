@@ -34,6 +34,8 @@ export interface ObraCompleta {
   data_inicio: DataISO | null
   data_prevista_fim: DataISO | null
   valor_contrato: Centavos
+  /** Verba de mao de obra do orcamento. Zero = nao informada. */
+  verba_mao_obra: Centavos
   percentual_rateio_parceiro: number
   base_rateio_parceiro: BaseRateioParceiro
   observacoes: string | null
@@ -50,7 +52,7 @@ export async function carregarObra(obraId: string): Promise<ObraCompleta | null>
     .from('obras')
     .select(
       `id, nome, endereco, tipo, forma_contratacao, status, data_inicio, data_prevista_fim,
-       valor_contrato, percentual_rateio_parceiro, base_rateio_parceiro, observacoes,
+       valor_contrato, verba_mao_obra, percentual_rateio_parceiro, base_rateio_parceiro, observacoes,
        cliente_id, cliente_pagador_id,
        cliente:clientes!obras_cliente_id_fkey (id, nome, razao_social_comprovante, documento),
        pagador:clientes!obras_cliente_pagador_id_fkey (id, nome, razao_social_comprovante, documento)`,

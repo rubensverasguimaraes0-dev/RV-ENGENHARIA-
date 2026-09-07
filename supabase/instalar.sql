@@ -116,6 +116,8 @@ create table public.obras (
   data_prevista_fim           date,
   status                      public.status_obra not null default 'em_andamento',
   valor_contrato              bigint not null default 0,
+  -- verba de mao de obra do orcamento; zero = nao informada
+  verba_mao_obra              bigint not null default 0,
   percentual_rateio_parceiro  numeric(5,4) not null default 0.5000,
   base_rateio_parceiro        public.base_rateio_parceiro not null default 'resultado_total',
   observacoes                 text,
