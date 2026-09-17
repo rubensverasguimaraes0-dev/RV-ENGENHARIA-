@@ -36,6 +36,7 @@ export async function salvarObra(_e: EstadoForm | null, form: FormData): Promise
     data_prevista_fim: dataOuNulo(form.get('data_prevista_fim')),
     status: textoObrigatorio(form.get('status')) || 'em_andamento',
     valor_contrato: moedaOuZero(form.get('valor_contrato')),
+    verba_mao_obra: moedaOuZero(form.get('verba_mao_obra')),
     percentual_rateio_parceiro: pct === null ? 0.5 : pct / 100,
     base_rateio_parceiro: textoObrigatorio(form.get('base_rateio_parceiro')) || 'resultado_total',
     observacoes: textoOuNulo(form.get('observacoes')),

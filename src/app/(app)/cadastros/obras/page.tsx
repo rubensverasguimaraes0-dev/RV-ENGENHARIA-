@@ -33,7 +33,7 @@ export default async function PaginaObrasCadastro({
     supabase
       .from('obras')
       .select(
-        'id, nome, cliente_id, cliente_pagador_id, endereco, tipo, forma_contratacao, data_inicio, data_prevista_fim, status, valor_contrato, percentual_rateio_parceiro, base_rateio_parceiro, observacoes',
+        'id, nome, cliente_id, cliente_pagador_id, endereco, tipo, forma_contratacao, data_inicio, data_prevista_fim, status, valor_contrato, verba_mao_obra, percentual_rateio_parceiro, base_rateio_parceiro, observacoes',
       )
       .is('excluido_em', null)
       .order('nome'),

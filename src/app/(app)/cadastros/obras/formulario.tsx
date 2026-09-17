@@ -16,6 +16,7 @@ export interface ObraForm {
   data_prevista_fim: string | null
   status: string
   valor_contrato: number
+  verba_mao_obra: number
   percentual_rateio_parceiro: number
   base_rateio_parceiro: string
   observacoes: string | null
@@ -101,13 +102,25 @@ export function FormularioObra({
           { valor: 'concluida', rotulo: 'Concluída' },
         ]}
       />
-      <Campo
-        rotulo="Valor do contrato"
-        nome="valor_contrato"
-        valor={obra ? formatarValor(obra.valor_contrato) : ''}
-        inputMode="decimal"
-        placeholder="10.960,00"
-      />
+      <div className="grid grid-cols-2 gap-2">
+        <Campo
+          rotulo="Valor do contrato"
+          nome="valor_contrato"
+          valor={obra ? formatarValor(obra.valor_contrato) : ''}
+          inputMode="decimal"
+          placeholder="10.960,00"
+        />
+        {/* Verba que o relatorio interno de mao de obra usa para apurar o saldo
+            que os executores dividem. Em branco = nao informada. */}
+        <Campo
+          rotulo="Verba de mão de obra"
+          nome="verba_mao_obra"
+          valor={obra?.verba_mao_obra ? formatarValor(obra.verba_mao_obra) : ''}
+          inputMode="decimal"
+          placeholder="3.500,00"
+          dica="Do orçamento. O relatório de mão de obra divide o que sobrar dela entre os executores."
+        />
+      </div>
       <div className="grid grid-cols-2 gap-2">
         <Campo
           rotulo="Rateio do parceiro (%)"
