@@ -42,9 +42,26 @@ export async function salvarObra(_e: EstadoForm | null, form: FormData): Promise
     observacoes: textoOuNulo(form.get('observacoes')),
   }
 
-  const { error } = id
-    ? await supabase.from('obras').update(registro).eq('id', id)
-    : await supabase.from('obras').insert(registro)
+  const gravar = (dados: Record<string, unknown>) =>
+    id
+      ? supabase.from('obras').update(dados).eq('id', id)
+      : supabase.from('obras').insert(dados)
+
+  const { error } = await gravar(registro)
+
+  // Banco que ainda nao recebeu a migracao 0012 nao tem verba_mao_obra. Em vez
+  // de perder o cadastro inteiro por causa de um campo, grava o resto e avisa.
+  if (error && /verba_mao_obra/.test(error.message)) {
+    const { verba_mao_obra: _ignorado, ...semVerba } = registro
+    void _ignorado
+    const nova = await gravar(semVerba)
+    if (nova.error) return { erro: nova.error.message }
+    revalidatePath('/cadastros/obras')
+    revalidatePath('/obras')
+    return {
+      ok: 'Obra salva. A verba de mão de obra ainda não foi guardada: o banco não recebeu a atualização.',
+    }
+  }
 
   if (error) return { erro: error.message }
 

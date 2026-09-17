@@ -52,7 +52,7 @@ export async function carregarObra(obraId: string): Promise<ObraCompleta | null>
     .from('obras')
     .select(
       `id, nome, endereco, tipo, forma_contratacao, status, data_inicio, data_prevista_fim,
-       valor_contrato, verba_mao_obra, percentual_rateio_parceiro, base_rateio_parceiro, observacoes,
+       valor_contrato, percentual_rateio_parceiro, base_rateio_parceiro, observacoes,
        cliente_id, cliente_pagador_id,
        cliente:clientes!obras_cliente_id_fkey (id, nome, razao_social_comprovante, documento),
        pagador:clientes!obras_cliente_pagador_id_fkey (id, nome, razao_social_comprovante, documento)`,
@@ -65,9 +65,31 @@ export async function carregarObra(obraId: string): Promise<ObraCompleta | null>
   const bruto = data as Record<string, unknown>
   return {
     ...(bruto as unknown as ObraCompleta),
+    verba_mao_obra: await lerVerbaMaoObra(obraId),
     cliente: primeiro(bruto.cliente),
     pagador: primeiro(bruto.pagador),
   }
+}
+
+/**
+ * A coluna verba_mao_obra chegou na migracao 0012. Enquanto ela nao for
+ * aplicada, pedi-la dentro do select da obra derruba TODA tela de obra: o
+ * PostgREST recusa a consulta inteira por causa de uma coluna que nao existe,
+ * carregarObra devolve null e a pagina cai em notFound.
+ *
+ * Por isso ela e lida a parte. Banco sem a coluna responde com erro, e a verba
+ * vale zero — que e exatamente o que "nao informada" significa.
+ */
+async function lerVerbaMaoObra(obraId: string): Promise<Centavos> {
+  const supabase = await criarClienteServidor()
+  const { data, error } = await supabase
+    .from('obras')
+    .select('verba_mao_obra')
+    .eq('id', obraId)
+    .maybeSingle()
+
+  if (error || !data) return 0
+  return Number((data as { verba_mao_obra?: number }).verba_mao_obra ?? 0)
 }
 
 function primeiro<T>(v: unknown): T | null {

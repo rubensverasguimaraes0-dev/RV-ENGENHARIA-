@@ -33,7 +33,7 @@ export default async function PaginaObrasCadastro({
     supabase
       .from('obras')
       .select(
-        'id, nome, cliente_id, cliente_pagador_id, endereco, tipo, forma_contratacao, data_inicio, data_prevista_fim, status, valor_contrato, verba_mao_obra, percentual_rateio_parceiro, base_rateio_parceiro, observacoes',
+        'id, nome, cliente_id, cliente_pagador_id, endereco, tipo, forma_contratacao, data_inicio, data_prevista_fim, status, valor_contrato, percentual_rateio_parceiro, base_rateio_parceiro, observacoes',
       )
       .is('excluido_em', null)
       .order('nome'),
@@ -41,7 +41,18 @@ export default async function PaginaObrasCadastro({
     supabase.from('locais_obra').select('id, obra_id, nome, endereco').is('excluido_em', null).order('nome'),
   ])
 
-  const obras = (obrasData ?? []) as ObraForm[]
+  // A coluna verba_mao_obra chegou na migracao 0012. Pedida dentro do select
+  // acima, uma unica coluna faltando derrubaria a lista inteira — por isso ela
+  // e lida a parte, e banco sem ela simplesmente devolve zero.
+  const { data: verbas } = await supabase.from('obras').select('id, verba_mao_obra')
+  const verbaPorObra = new Map(
+    (verbas ?? []).map((v) => [v.id as string, Number(v.verba_mao_obra ?? 0)]),
+  )
+
+  const obras = ((obrasData ?? []) as ObraForm[]).map((o) => ({
+    ...o,
+    verba_mao_obra: verbaPorObra.get(o.id) ?? 0,
+  }))
   const clientes = (clientesData ?? []) as { id: string; nome: string }[]
   const locais = (locaisData ?? []) as { id: string; obra_id: string; nome: string; endereco: string | null }[]
   const nomeCliente = new Map(clientes.map((c) => [c.id, c.nome]))
