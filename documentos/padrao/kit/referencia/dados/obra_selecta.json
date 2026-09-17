@@ -1,0 +1,721 @@
+{
+ "obra": {
+  "nome": "Selecta – Gil Martins",
+  "endereco": "Av. Gil Martins, 3144 – Três Andares – Teresina/PI",
+  "empresa": "RV Engenharia",
+  "responsavel": "Rubens Veras Guimarães",
+  "crea": "CREA-PI 35900",
+  "inicio": "2026-07-20"
+ },
+ "equipe": [
+  {
+   "nome": "Thiago",
+   "funcao": "Pedreiro",
+   "diaria": 200.0,
+   "entrada": "2026-07-20",
+   "saida": null,
+   "status": "ativo"
+  },
+  {
+   "nome": "Wiliton",
+   "funcao": "Eletricista",
+   "diaria": 200.0,
+   "entrada": "2026-07-23",
+   "saida": null,
+   "status": "ativo"
+  },
+  {
+   "nome": "Gervasio",
+   "funcao": "Ajudante",
+   "diaria": 90.0,
+   "entrada": "2026-07-20",
+   "saida": "2026-07-29",
+   "status": "desligado"
+  },
+  {
+   "nome": "Máximo",
+   "funcao": "Ajudante",
+   "diaria": 100.0,
+   "entrada": "2026-07-25",
+   "saida": null,
+   "status": "ativo"
+  },
+  {
+   "nome": "Amigo Máximo",
+   "funcao": "Ajudante",
+   "diaria": 100.0,
+   "entrada": "2026-07-25",
+   "saida": null,
+   "status": "ativo"
+  },
+  {
+   "nome": "Wellington",
+   "funcao": "Servente",
+   "diaria": 90.0,
+   "entrada": "2026-07-28",
+   "saida": "2026-08-03",
+   "status": "desligado"
+  },
+  {
+   "nome": "Roberto Júnior",
+   "funcao": "Servente",
+   "diaria": 90.0,
+   "entrada": "2026-07-28",
+   "saida": "2026-08-03",
+   "status": "desligado"
+  },
+  {
+   "nome": "Eduardo",
+   "funcao": "Servente",
+   "diaria": 90.0,
+   "entrada": "2026-07-29",
+   "saida": "2026-08-07",
+   "status": "desligado"
+  },
+  {
+   "nome": "Rafael",
+   "funcao": "Eletricista",
+   "diaria": 200.0,
+   "entrada": "2026-08-11",
+   "saida": null,
+   "status": "ativo"
+  },
+  {
+   "nome": "Iago",
+   "funcao": "Servente",
+   "diaria": 90.0,
+   "entrada": "2026-08-12",
+   "saida": null,
+   "status": "ativo"
+  },
+  {
+   "nome": "Francisco",
+   "funcao": "Pedreiro",
+   "diaria": 160.0,
+   "entrada": "2026-09-08",
+   "saida": null,
+   "status": "ativo"
+  },
+  {
+   "nome": "Rufino",
+   "funcao": "Servente",
+   "diaria": 100.0,
+   "entrada": "2026-09-08",
+   "saida": null,
+   "status": "ativo"
+  },
+  {
+   "nome": "Carlos",
+   "funcao": "Servente",
+   "diaria": 100.0,
+   "entrada": "2026-09-08",
+   "saida": null,
+   "status": "ativo"
+  }
+ ],
+ "semanas": [
+  {
+   "numero": 1,
+   "inicio": "2026-07-20",
+   "fim": "2026-07-25"
+  },
+  {
+   "numero": 2,
+   "inicio": "2026-07-27",
+   "fim": "2026-07-31"
+  },
+  {
+   "numero": 3,
+   "inicio": "2026-08-03",
+   "fim": "2026-08-07"
+  },
+  {
+   "numero": 4,
+   "inicio": "2026-08-10",
+   "fim": "2026-08-14"
+  },
+  {
+   "numero": 5,
+   "inicio": "2026-08-17",
+   "fim": "2026-08-20"
+  },
+  {
+   "numero": 6,
+   "inicio": "2026-08-24",
+   "fim": "2026-08-28"
+  },
+  {
+   "numero": 7,
+   "inicio": "2026-08-31",
+   "fim": "2026-09-04"
+  },
+  {
+   "numero": 8,
+   "inicio": "2026-09-07",
+   "fim": "2026-09-12"
+  },
+  {
+   "numero": 9,
+   "inicio": "2026-09-14",
+   "fim": "2026-09-19"
+  }
+ ],
+ "lancamentos": [
+  {
+   "data": "2026-07-20",
+   "presencas": {
+    "Thiago": 1,
+    "Gervasio": 1
+   },
+   "quentinhas": 2,
+   "valor_quentinha": 22.0,
+   "observacao": ""
+  },
+  {
+   "data": "2026-07-21",
+   "presencas": {
+    "Thiago": 1,
+    "Gervasio": 1
+   },
+   "quentinhas": 2,
+   "valor_quentinha": 22.0,
+   "observacao": ""
+  },
+  {
+   "data": "2026-07-22",
+   "presencas": {
+    "Thiago": 1,
+    "Gervasio": 1
+   },
+   "quentinhas": 2,
+   "valor_quentinha": 22.0,
+   "observacao": ""
+  },
+  {
+   "data": "2026-07-23",
+   "presencas": {
+    "Thiago": 1,
+    "Gervasio": 1,
+    "Wiliton": 1
+   },
+   "quentinhas": 3,
+   "valor_quentinha": 22.0,
+   "observacao": "Entrada de Wiliton (eletricista, R$ 200,00)"
+  },
+  {
+   "data": "2026-07-24",
+   "presencas": {
+    "Thiago": 1,
+    "Gervasio": 1,
+    "Wiliton": 1
+   },
+   "quentinhas": 3,
+   "valor_quentinha": 22.0,
+   "observacao": ""
+  },
+  {
+   "data": "2026-07-25",
+   "presencas": {
+    "Thiago": 1,
+    "Gervasio": 1,
+    "Máximo": 1,
+    "Amigo Máximo": 1
+   },
+   "quentinhas": 0,
+   "valor_quentinha": 22.0,
+   "observacao": "Sábado até meio-dia: diária integral e sem quentinha. Entrada de Máximo e Amigo Máximo (ajudantes, R$ 100,00)"
+  },
+  {
+   "data": "2026-07-27",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1,
+    "Gervasio": 1
+   },
+   "quentinhas": 3,
+   "valor_quentinha": 22.0,
+   "observacao": ""
+  },
+  {
+   "data": "2026-07-28",
+   "presencas": {
+    "Thiago": 1,
+    "Gervasio": 1,
+    "Wellington": 1,
+    "Roberto Júnior": 1
+   },
+   "quentinhas": 4,
+   "valor_quentinha": 22.0,
+   "observacao": "Integração de Wellington e Roberto Júnior (serventes, R$ 90,00)"
+  },
+  {
+   "data": "2026-07-29",
+   "presencas": {
+    "Thiago": 1,
+    "Eduardo": 1,
+    "Wellington": 1,
+    "Roberto Júnior": 1
+   },
+   "quentinhas": 4,
+   "valor_quentinha": 15.0,
+   "observacao": "Integração de Eduardo (servente, R$ 90,00). Desligamento de Gervasio. Troca de fornecedor: quentinha de R$ 22,00 para R$ 15,00"
+  },
+  {
+   "data": "2026-07-30",
+   "presencas": {
+    "Thiago": 1,
+    "Eduardo": 1,
+    "Wellington": 1,
+    "Roberto Júnior": 1
+   },
+   "quentinhas": 4,
+   "valor_quentinha": 15.0,
+   "observacao": ""
+  },
+  {
+   "data": "2026-07-31",
+   "presencas": {
+    "Thiago": 1,
+    "Eduardo": 1,
+    "Wellington": 1,
+    "Roberto Júnior": 1
+   },
+   "quentinhas": 4,
+   "valor_quentinha": 15.0,
+   "observacao": "Encerramento da semana na sexta-feira"
+  },
+  {
+   "data": "2026-08-03",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1,
+    "Eduardo": 1
+   },
+   "quentinhas": 3,
+   "valor_quentinha": 15.0,
+   "observacao": "Desligamento de Wellington e Roberto Júnior"
+  },
+  {
+   "data": "2026-08-04",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1,
+    "Eduardo": 1
+   },
+   "quentinhas": 3,
+   "valor_quentinha": 22.0,
+   "observacao": "Quentinha do dia comprada a R$ 22,00"
+  },
+  {
+   "data": "2026-08-05",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1,
+    "Eduardo": 1
+   },
+   "quentinhas": 3,
+   "valor_quentinha": 15.0,
+   "observacao": ""
+  },
+  {
+   "data": "2026-08-06",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1,
+    "Eduardo": 1
+   },
+   "quentinhas": 3,
+   "valor_quentinha": 18.0,
+   "observacao": "Novo fornecedor de quentinhas: R$ 18,00"
+  },
+  {
+   "data": "2026-08-07",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1
+   },
+   "quentinhas": 2,
+   "valor_quentinha": 18.0,
+   "observacao": "Desligamento de Eduardo. Encerramento da semana na sexta-feira"
+  },
+  {
+   "data": "2026-08-10",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1
+   },
+   "quentinhas": 2,
+   "valor_quentinha": 18.0,
+   "observacao": ""
+  },
+  {
+   "data": "2026-08-11",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1,
+    "Rafael": 1
+   },
+   "quentinhas": 4,
+   "valor_quentinha": 18.0,
+   "observacao": "Rafael (eletricista, R$ 200,00) entra como reforço. 4 quentinhas para 3 funcionários: 1 unidade para o responsável pela obra"
+  },
+  {
+   "data": "2026-08-12",
+   "presencas": {
+    "Thiago": 1,
+    "Iago": 0.5
+   },
+   "quentinhas": 2,
+   "valor_quentinha": 18.0,
+   "observacao": "Integração de Iago (servente, R$ 90,00) com meio expediente no primeiro dia (meia diária)"
+  },
+  {
+   "data": "2026-08-13",
+   "presencas": {
+    "Thiago": 1,
+    "Iago": 1
+   },
+   "quentinhas": 2,
+   "valor_quentinha": 18.0,
+   "observacao": "Iago em expediente integral"
+  },
+  {
+   "data": "2026-08-14",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1,
+    "Iago": 1
+   },
+   "quentinhas": 3,
+   "valor_quentinha": 22.0,
+   "observacao": "Quentinha a R$ 22,00 (fornecedor de R$ 18,00 indisponível). Encerramento da semana na sexta-feira"
+  },
+  {
+   "data": "2026-08-17",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1,
+    "Iago": 1
+   },
+   "quentinhas": 3,
+   "valor_quentinha": 18.0,
+   "observacao": ""
+  },
+  {
+   "data": "2026-08-18",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1,
+    "Iago": 1
+   },
+   "quentinhas": 3,
+   "valor_quentinha": 18.0,
+   "observacao": ""
+  },
+  {
+   "data": "2026-08-19",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1,
+    "Iago": 1
+   },
+   "quentinhas": 3,
+   "valor_quentinha": 18.0,
+   "observacao": ""
+  },
+  {
+   "data": "2026-08-20",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1,
+    "Iago": 1
+   },
+   "quentinhas": 3,
+   "valor_quentinha": 18.0,
+   "observacao": "Encerramento da semana na quinta-feira, sem expediente na sexta e no sábado"
+  },
+  {
+   "data": "2026-08-24",
+   "presencas": {
+    "Thiago": 1
+   },
+   "quentinhas": 1,
+   "valor_quentinha": 18.0,
+   "observacao": "Somente Thiago na obra"
+  },
+  {
+   "data": "2026-08-25",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1
+   },
+   "quentinhas": 2,
+   "valor_quentinha": 18.0,
+   "observacao": "Retorno de Wiliton"
+  },
+  {
+   "data": "2026-08-26",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1
+   },
+   "quentinhas": 2,
+   "valor_quentinha": 22.0,
+   "observacao": "Quentinha passa de R$ 18,00 para R$ 22,00"
+  },
+  {
+   "data": "2026-08-27",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1
+   },
+   "quentinhas": 2,
+   "valor_quentinha": 22.0,
+   "observacao": ""
+  },
+  {
+   "data": "2026-08-28",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1
+   },
+   "quentinhas": 2,
+   "valor_quentinha": 22.0,
+   "observacao": "Encerramento da semana na sexta-feira"
+  },
+  {
+   "data": "2026-08-31",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1
+   },
+   "quentinhas": 2,
+   "valor_quentinha": 22.0,
+   "observacao": "Último dia de agosto"
+  },
+  {
+   "data": "2026-09-01",
+   "presencas": {
+    "Thiago": 1
+   },
+   "quentinhas": 1,
+   "valor_quentinha": 18.0,
+   "observacao": "Somente Thiago. Quentinha volta a R$ 18,00"
+  },
+  {
+   "data": "2026-09-02",
+   "presencas": {
+    "Thiago": 1,
+    "Wiliton": 1,
+    "Máximo": 1
+   },
+   "quentinhas": 3,
+   "valor_quentinha": 18.0,
+   "observacao": "Retorno de Máximo à obra (ajudante, R$ 100,00)"
+  },
+  {
+   "data": "2026-09-03",
+   "presencas": {
+    "Thiago": 1,
+    "Máximo": 1
+   },
+   "quentinhas": 2,
+   "valor_quentinha": 18.0,
+   "observacao": ""
+  },
+  {
+   "data": "2026-09-04",
+   "presencas": {
+    "Thiago": 1,
+    "Máximo": 1
+   },
+   "quentinhas": 2,
+   "valor_quentinha": 18.0,
+   "observacao": "Encerramento da semana na sexta-feira, sem expediente no sábado"
+  },
+  {
+   "data": "2026-09-07",
+   "presencas": {
+    "Thiago": 1
+   },
+   "quentinhas": 0,
+   "valor_quentinha": 18.0,
+   "extras": [],
+   "observacao": "Feriado (Independência): expediente até meio-dia, diária integral e sem quentinha"
+  },
+  {
+   "data": "2026-09-08",
+   "presencas": {
+    "Thiago": 1,
+    "Francisco": 1,
+    "Rufino": 1,
+    "Carlos": 1
+   },
+   "quentinhas": 4,
+   "valor_quentinha": 18.0,
+   "extras": [
+    {
+     "descricao": "Gelo",
+     "qtd": 2,
+     "valor": 6.0
+    }
+   ],
+   "observacao": "Entrada de Francisco (pedreiro, R$ 160,00), Rufino e Carlos (serventes, R$ 100,00). Início da compra de gelo"
+  },
+  {
+   "data": "2026-09-09",
+   "presencas": {
+    "Thiago": 1,
+    "Francisco": 1,
+    "Rufino": 1,
+    "Carlos": 1
+   },
+   "quentinhas": 4,
+   "valor_quentinha": 18.0,
+   "extras": [
+    {
+     "descricao": "Gelo",
+     "qtd": 2,
+     "valor": 6.0
+    }
+   ],
+   "observacao": ""
+  },
+  {
+   "data": "2026-09-10",
+   "presencas": {
+    "Thiago": 1,
+    "Francisco": 1,
+    "Rufino": 1,
+    "Carlos": 1
+   },
+   "quentinhas": 4,
+   "valor_quentinha": 18.0,
+   "extras": [
+    {
+     "descricao": "Gelo",
+     "qtd": 2,
+     "valor": 6.0
+    },
+    {
+     "descricao": "Entrega de quentinhas",
+     "qtd": 1,
+     "valor": 10.0
+    }
+   ],
+   "observacao": "Quentinha com entrega (R$ 10,00)"
+  },
+  {
+   "data": "2026-09-11",
+   "presencas": {
+    "Thiago": 1,
+    "Francisco": 1,
+    "Rufino": 1,
+    "Carlos": 1
+   },
+   "quentinhas": 4,
+   "valor_quentinha": 18.0,
+   "extras": [
+    {
+     "descricao": "Gelo",
+     "qtd": 2,
+     "valor": 6.0
+    },
+    {
+     "descricao": "Entrega de quentinhas",
+     "qtd": 1,
+     "valor": 10.0
+    }
+   ],
+   "observacao": "Quentinha com entrega (R$ 10,00). Encerramento da semana na sexta-feira"
+  },
+  {
+   "data": "2026-09-14",
+   "presencas": {
+    "Thiago": 1,
+    "Francisco": 1,
+    "Rufino": 1,
+    "Carlos": 1
+   },
+   "quentinhas": 4,
+   "valor_quentinha": 18.0,
+   "extras": [
+    {
+     "descricao": "Gelo",
+     "qtd": 1,
+     "valor": 5.0
+    }
+   ],
+   "observacao": "Início do revestimento cerâmico 70x70 (~110 m²) por produção: concluído antes de sexta, a equipe recebe a semana inteira"
+  },
+  {
+   "data": "2026-09-15",
+   "presencas": {
+    "Thiago": 1,
+    "Francisco": 1,
+    "Rufino": 1,
+    "Carlos": 1,
+    "Wiliton": 1
+   },
+   "quentinhas": 5,
+   "valor_quentinha": 18.0,
+   "extras": [
+    {
+     "descricao": "Gelo",
+     "qtd": 1,
+     "valor": 7.0
+    }
+   ],
+   "observacao": "Retorno de Wiliton (por presença, fora do acordo de produção). Produção do dia anterior: ~39 m²"
+  },
+  {
+   "data": "2026-09-16",
+   "presencas": {
+    "Thiago": 1,
+    "Francisco": 1,
+    "Rufino": 1,
+    "Carlos": 1,
+    "Wiliton": 1
+   },
+   "quentinhas": 5,
+   "valor_quentinha": 18.0,
+   "extras": [
+    {
+     "descricao": "Gelo",
+     "qtd": 1,
+     "valor": 7.0
+    }
+   ],
+   "bonus": {
+    "descricao": "Bônus de produção — revestimento 110 m² concluído em 3 dias (2 diárias por pessoa)",
+    "diarias": {
+     "Thiago": 2,
+     "Francisco": 2,
+     "Rufino": 2,
+     "Carlos": 2
+    }
+   },
+   "observacao": "Revestimento cerâmico concluído. Bônus de produção: quinta e sexta pagas aos quatro do acordo"
+  },
+  {
+   "data": "2026-09-17",
+   "presencas": {
+    "Thiago": 1,
+    "Francisco": 1,
+    "Rufino": 1,
+    "Carlos": 1,
+    "Wiliton": 1
+   },
+   "quentinhas": 5,
+   "valor_quentinha": 18.0,
+   "extras": [
+    {
+     "descricao": "Gelo",
+     "qtd": 1,
+     "valor": 5.0
+    }
+   ],
+   "observacao": "Dia normal em outra frente (fora do acordo de produção)"
+  }
+ ]
+}
