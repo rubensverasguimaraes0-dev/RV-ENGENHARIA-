@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation'
  */
 const ABAS = [
   { sufixo: '', rotulo: 'Painel', soAdmin: true },
+  { sufixo: '/conferencia', rotulo: 'Conferência', soAdmin: true },
   { sufixo: '/dia', rotulo: 'Lançar o dia', soAdmin: false },
   { sufixo: '/semanas', rotulo: 'Semanas', soAdmin: true },
   { sufixo: '/notas', rotulo: 'Notas', soAdmin: false },
