@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { supabaseConfigurado } from '@/lib/supabase/config'
+import { fetchComLimite, LIMITE_MIDDLEWARE_MS } from '@/lib/supabase/tempo-limite'
 
 /** Renova a sessao do Supabase a cada navegacao e protege as rotas do app. */
 export async function middleware(request: NextRequest) {
@@ -13,12 +14,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // A tela que avisa que o banco caiu nao pode depender do banco.
+  if (request.nextUrl.pathname === '/indisponivel') return NextResponse.next({ request })
+
   let response = NextResponse.next({ request })
+  const rede = fetchComLimite(LIMITE_MIDDLEWARE_MS)
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      global: { fetch: rede.fetch },
       cookies: {
         getAll() {
           return request.cookies.getAll()
@@ -37,6 +43,16 @@ export async function middleware(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
+  // Banco pausado ou fora do ar: em vez de prender a pagina ate a Vercel cortar
+  // com um 504 em ingles, mostra a tela que explica o que fazer.
+  if (rede.falhou()) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/indisponivel'
+    url.search = ''
+    url.searchParams.set('proximo', request.nextUrl.pathname + request.nextUrl.search)
+    return NextResponse.redirect(url)
+  }
 
   const { pathname } = request.nextUrl
   // Quem perdeu a senha nao tem sessao — se estas rotas exigissem login, a

@@ -1,5 +1,6 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { fetchComLimite, LIMITE_SERVIDOR_MS } from './tempo-limite'
 
 type CookieParaGravar = { name: string; value: string; options?: CookieOptions }
 
@@ -11,6 +12,8 @@ export async function criarClienteServidor() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      // Banco sem resposta vira erro em segundos, em vez de prender a tela.
+      global: { fetch: fetchComLimite(LIMITE_SERVIDOR_MS).fetch },
       cookies: {
         getAll() {
           return cookieStore.getAll()
