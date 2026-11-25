@@ -1,5 +1,19 @@
 # Banco que se atualiza sozinho
 
+> **Desde novembro de 2026: nada a configurar.** A cada publicação de produção na
+> Vercel, `scripts/migrar-no-build.mjs` roda antes do `next build` e aplica as
+> migrações pendentes usando a conexão que a integração do Supabase já cadastrou
+> na Vercel (`POSTGRES_URL_NON_POOLING` / `POSTGRES_URL`). Nenhum segredo precisa
+> ser criado à mão. O que acontece fica no registro do build, nas linhas `[banco]`.
+>
+> Banco fora do ar ou migração com erro não derrubam a publicação: viram aviso,
+> a migração é desfeita inteira e fica para a próxima publicação. Publicação de
+> preview (outras branches) nunca toca o banco.
+>
+> O fluxo do GitHub Actions descrito abaixo continua existindo, mas só roda à
+> mão (Actions → Migrar banco → Run workflow) e depende do segredo
+> `SUPABASE_DB_URL` correto.
+
 Antes: toda vez que o app ganhava uma tabela nova, alguém precisava abrir o
 painel do Supabase, achar o SQL Editor, copiar um arquivo e clicar em Run.
 

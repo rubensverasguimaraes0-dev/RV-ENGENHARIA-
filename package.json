@@ -5,7 +5,7 @@
   "description": "App de Gestao RV Engenharia - obras civis, energia solar e locacao de equipamentos",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/migrar-no-build.mjs && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -30,6 +30,7 @@
     "@types/react-dom": "^19.0.3",
     "eslint": "^9.39.5",
     "eslint-config-next": "^15.5.24",
+    "pg": "^8.23.1",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.3",
     "vitest": "^3.0.4"

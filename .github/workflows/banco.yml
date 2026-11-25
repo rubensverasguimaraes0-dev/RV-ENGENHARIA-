@@ -9,17 +9,11 @@
 # =============================================================================
 name: Migrar banco
 
+# Desde novembro o banco se atualiza na publicacao da Vercel
+# (scripts/migrar-no-build.mjs), que ja tem a conexao do banco sem nenhum
+# segredo cadastrado a mao. Este fluxo ficou so para rodar a mao, se um dia for
+# preciso — e so funciona com o segredo SUPABASE_DB_URL correto.
 on:
-  push:
-    # So as branches principais mexem no banco de verdade. Branch de
-    # experimento nao encosta em producao.
-    branches:
-      - main
-      - claude/new-session-qhl3bf
-    paths:
-      - 'supabase/migrations/**'
-      - 'scripts/migrar-banco.mjs'
-      - '.github/workflows/banco.yml'
   workflow_dispatch:
     inputs:
       apenas_listar:
