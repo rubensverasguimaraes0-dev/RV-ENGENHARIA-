@@ -35,3 +35,20 @@ describe('fetchComLimite — banco que nao responde nao prende o app', () => {
     await expect(p).rejects.toBeDefined()
   })
 })
+
+describe('fetchComLimite — sessao vencida nao multiplica a espera', () => {
+  it('depois da primeira falha, as tentativas seguintes desistem na hora', async () => {
+    let chamadas = 0
+    vi.stubGlobal('fetch', (_: unknown, init?: RequestInit) => {
+      chamadas++
+      return new Promise((_r, rejeitar) => init?.signal?.addEventListener('abort', () => rejeitar(init.signal!.reason)))
+    })
+    const rede = fetchComLimite(50)
+    await expect(rede.fetch('https://banco.exemplo')).rejects.toThrow()
+    const inicio = Date.now()
+    await expect(rede.fetch('https://banco.exemplo')).rejects.toThrow()
+    await expect(rede.fetch('https://banco.exemplo')).rejects.toThrow()
+    expect(Date.now() - inicio).toBeLessThan(20)
+    expect(chamadas).toBe(1)
+  })
+})

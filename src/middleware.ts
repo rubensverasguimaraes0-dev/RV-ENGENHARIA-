@@ -40,9 +40,14 @@ export async function middleware(request: NextRequest) {
     },
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // Prazo total, alem do prazo de cada chamada: nada aqui pode passar dos 25 s
+  // em que a Vercel corta o middleware.
+  const resultado = await Promise.race([
+    supabase.auth.getUser(),
+    new Promise<null>((resolver) => setTimeout(() => resolver(null), LIMITE_MIDDLEWARE_MS + 2_000)),
+  ])
+  const user = resultado?.data.user ?? null
+  if (resultado === null) rede.marcarFalha()
 
   // Banco pausado ou fora do ar: em vez de prender a pagina ate a Vercel cortar
   // com um 504 em ingles, mostra a tela que explica o que fazer.

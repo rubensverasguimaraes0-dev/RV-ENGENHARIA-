@@ -18,12 +18,19 @@ export interface FetchComLimite {
   fetch: typeof fetch
   /** true se alguma chamada estourou o tempo ou nem conseguiu conectar. */
   falhou: () => boolean
+  /** Para quem desistiu por fora (prazo total) registrar a falha. */
+  marcarFalha: () => void
 }
 
 export function fetchComLimite(ms: number): FetchComLimite {
   let falhou = false
 
   const fetchLimitado: typeof fetch = async (entrada, init) => {
+    // A biblioteca do Supabase tenta de novo, com espera crescente, quando a
+    // renovacao do login falha — e a sessao de quem ficou dias sem abrir o app
+    // esta sempre vencida. Somadas, as tentativas passavam dos 25 s da Vercel e o
+    // 504 voltava. Depois da primeira falha, desiste na hora.
+    if (falhou) throw new Error('banco sem resposta')
     const limite = AbortSignal.timeout(ms)
     const signal = init?.signal ? AbortSignal.any([init.signal, limite]) : limite
     try {
@@ -36,5 +43,11 @@ export function fetchComLimite(ms: number): FetchComLimite {
     }
   }
 
-  return { fetch: fetchLimitado, falhou: () => falhou }
+  return {
+    fetch: fetchLimitado,
+    falhou: () => falhou,
+    marcarFalha: () => {
+      falhou = true
+    },
+  }
 }
